@@ -6,14 +6,77 @@ Configuration files for Yandex Direct API.
 
 ### direct.json
 
-Complete configuration for Yandex Direct API with all available resources:
+Complete configuration for Yandex Direct API with all available services:
 
-- **Reports** - Get statistics and reports
-- **Campaigns** - Manage advertising campaigns
-- **Ad Groups** - Manage ad groups
-- **Ads** - Manage advertisements
-- **Keywords** - Manage keywords
-- And many more...
+## Services
+
+### Reports
+- **reports** - Получение статистики по аккаунту Директа
+
+### Campaigns
+- **campaigns** - Управление кампаниями (add, delete, get, update, archive, unarchive, resume, suspend)
+
+### Ad Groups
+- **adgroups** - Управление группами объявлений (add, delete, get, update)
+
+### Ads
+- **ads** - Управление объявлениями (add, delete, get, update, archive, unarchive, resume, suspend, moderate)
+
+### Keywords
+- **keywords** - Управление ключевыми фразами и автотаргетингами (add, delete, get, update, resume, suspend)
+
+### Bids
+- **bids** - Управление ставками (get, set, setAuto)
+- **keywordbids** - Управление ставками по ключевым фразам (get, set, setAuto)
+- **bidmodifiers** - Управление корректировками ставок (add, delete, get, set)
+
+### Negative Keywords
+- **negativekeywordsharedsets** - Управление наборами минус-фраз (add, delete, get, update)
+
+### Keywords Research
+- **keywordsresearch** - Предобработка ключевых фраз (deduplicate, hasSearchVolume)
+
+### Businesses
+- **businesses** - Получение профилей организаций (get)
+
+### Media
+- **adimages** - Операции с изображениями (add, delete, get)
+- **creatives** - Получение креативов (add, get)
+- **advideos** - Операции с видео (add, get)
+
+### Turbo Pages
+- **turbopages** - Получение параметров Турбо-страниц (get)
+- **leads** - Получение данных из форм на Турбо-страницах (get)
+
+### Extensions
+- **sitelinks** - Операции с быстрыми ссылками (add, delete, get)
+- **adextensions** - Операции с расширениями объявлений (add, delete, get)
+
+### Audience
+- **audiencetargets** - Управление условиями нацеливания на аудиторию (add, delete, get, resume, setBids, suspend)
+- **retargetinglists** - Управление условиями ретаргетинга и подбора аудитории (add, delete, get, update)
+
+### Clients
+- **clients** - Управление параметрами рекламодателя (get, update)
+- **agencyclients** - Управление клиентами агентства (add, get, update)
+
+### Feeds
+- **feeds** - Операции с фидами (add, delete, get, update)
+
+### Dictionaries
+- **dictionaries** - Получение справочных данных (get)
+
+### Changes
+- **changes** - Проверка наличия изменений (check, checkCampaigns, checkDictionaries)
+
+### Strategies
+- **strategies** - Операции с пакетными стратегиями (get, set)
+
+### Account
+- **accountlogins** - Получение списка логинов (get)
+- **balance** - Получение информации о балансе (get)
+- **units** - Получение информации об использовании баллов (get)
+- **grants** - Получение списка грантов (get)
 
 ## Setup
 
@@ -28,7 +91,7 @@ Complete configuration for Yandex Direct API with all available resources:
 ```bash
 # Linux/macOS
 export YANDEX_DIRECT_TOKEN="your-oauth-token"
-export YANDEX_DIRECT_CLIENT_LOGIN="your-login"  # Optional, if different from token owner
+export YANDEX_DIRECT_CLIENT_LOGIN="your-login"  # Optional
 
 # Windows
 set YANDEX_DIRECT_TOKEN=your-oauth-token
@@ -44,8 +107,25 @@ client = ApiForgeClient(
     config_path="apiforge-configs/yandex/direct.json"
 )
 
-# Make a request
-response = client.request("reports", data={...})
+# Get campaigns
+response = client.request("campaigns", data={
+    "params": {
+        "fieldNames": ["Id", "Name", "Status"]
+    }
+})
+
+# Get report
+response = client.request("reports", data={
+    "params": {
+        "SelectionCriteria": {},
+        "FieldNames": ["Date", "Impressions", "Clicks"],
+        "ReportName": "my_report",
+        "ReportType": "ACCOUNT_PERFORMANCE_REPORT",
+        "DateRangeType": "LAST_7_DAYS",
+        "Format": "TSV",
+        "IncludeVAT": "YES"
+    }
+})
 ```
 
 ## Sandbox
@@ -53,9 +133,8 @@ response = client.request("reports", data={...})
 For testing, use the sandbox environment:
 
 ```python
-import os
+from apiforge import ApiForgeClient
 
-# Use sandbox URL
 client = ApiForgeClient(
     config_path="apiforge-configs/yandex/direct.json"
 )
@@ -65,86 +144,14 @@ client._base_url = "https://api-sandbox.direct.yandex.com/json/v5"
 client._adapter.base_url = client._base_url
 ```
 
-## Resources
-
-### Reports
-
-Get statistics and reports from Yandex Direct.
-
-**Endpoint:** `POST /reports`
-
-**Required Parameters:**
-- `SelectionCriteria` - Data selection criteria
-- `FieldNames` - Fields to include in report
-- `ReportName` - Unique report name
-- `ReportType` - Type of report
-- `DateRangeType` - Report period
-- `Format` - Report format (TSV)
-- `IncludeVAT` - Include VAT in amounts
-
-**Report Types:**
-- `ACCOUNT_PERFORMANCE_REPORT` - Account statistics
-- `CAMPAIGN_PERFORMANCE_REPORT` - Campaign statistics
-- `ADGROUP_PERFORMANCE_REPORT` - Ad group statistics
-- `AD_PERFORMANCE_REPORT` - Ad statistics
-- `CRITERIA_PERFORMANCE_REPORT` - Keyword statistics
-- `CUSTOM_REPORT` - Custom report
-- `REACH_AND_FREQUENCY_PERFORMANCE_REPORT` - Display campaign statistics
-- `SEARCH_QUERY_PERFORMANCE_REPORT` - Search query statistics
-
-**Date Range Types:**
-- `TODAY` - Current day
-- `YESTERDAY` - Yesterday
-- `LAST_3_DAYS` - Last 3 days
-- `LAST_7_DAYS` - Last 7 days
-- `LAST_30_DAYS` - Last 30 days
-- `CUSTOM_DATE` - Custom date range
-- `ALL_TIME` - All available statistics
-
-### Campaigns
-
-Get list of advertising campaigns.
-
-**Endpoint:** `GET /campaigns`
-
-**Parameters:**
-- `fieldNames` - Fields to include in response
-
-### Ad Groups
-
-Get list of ad groups.
-
-**Endpoint:** `GET /adgroups`
-
-**Parameters:**
-- `fieldNames` - Fields to include in response
-
-### Ads
-
-Get list of advertisements.
-
-**Endpoint:** `GET /ads`
-
-**Parameters:**
-- `fieldNames` - Fields to include in response
-
-### Keywords
-
-Get list of keywords.
-
-**Endpoint:** `GET /keywords`
-
-**Parameters:**
-- `fieldNames` - Fields to include in response
-
 ## Examples
 
 See [examples/yandex_direct_reports.py](../../examples/yandex_direct_reports.py) for complete usage examples.
 
 ## Documentation
 
-- [Yandex Direct API Documentation](https://yandex.ru/dev/direct/doc/ru/reports)
+- [Yandex Direct API Documentation](https://yandex.ru/dev/direct/doc/ru/concepts/overview)
+- [API Reference](https://yandex.ru/dev/direct/doc/ru/concepts/about)
 - [Reports Service](https://yandex.ru/dev/direct/doc/ru/reports)
 - [HTTP Headers](https://yandex.ru/dev/direct/doc/ru/headers)
-- [Report Specification](https://yandex.ru/dev/direct/doc/ru/spec)
 - [Sandbox](https://yandex.ru/dev/direct/doc/ru/concepts/sandbox)

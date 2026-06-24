@@ -113,28 +113,253 @@ class TestYandexDirectConfig:
         assert "campaigns" in direct_config["resources"]
         campaigns = direct_config["resources"]["campaigns"]
         assert campaigns["path"] == "/campaigns"
-        assert campaigns["method"] == "GET"
+        assert campaigns["method"] == "POST"
+        assert "methods" in campaigns
+        assert "add" in campaigns["methods"]
+        assert "get" in campaigns["methods"]
+        assert "update" in campaigns["methods"]
+        assert "delete" in campaigns["methods"]
     
     def test_adgroups_resource(self, direct_config):
         """Test adgroups resource exists."""
         assert "adgroups" in direct_config["resources"]
         adgroups = direct_config["resources"]["adgroups"]
         assert adgroups["path"] == "/adgroups"
-        assert adgroups["method"] == "GET"
+        assert adgroups["method"] == "POST"
+        assert "methods" in adgroups
+        assert "add" in adgroups["methods"]
+        assert "get" in adgroups["methods"]
     
     def test_ads_resource(self, direct_config):
         """Test ads resource exists."""
         assert "ads" in direct_config["resources"]
         ads = direct_config["resources"]["ads"]
         assert ads["path"] == "/ads"
-        assert ads["method"] == "GET"
+        assert ads["method"] == "POST"
+        assert "methods" in ads
+        assert "add" in ads["methods"]
+        assert "get" in ads["methods"]
+        assert "moderate" in ads["methods"]
     
     def test_keywords_resource(self, direct_config):
         """Test keywords resource exists."""
         assert "keywords" in direct_config["resources"]
         keywords = direct_config["resources"]["keywords"]
         assert keywords["path"] == "/keywords"
-        assert keywords["method"] == "GET"
+        assert keywords["method"] == "POST"
+        assert "methods" in keywords
+        assert "add" in keywords["methods"]
+        assert "get" in keywords["methods"]
+    
+    def test_bids_resource(self, direct_config):
+        """Test bids resource exists."""
+        assert "bids" in direct_config["resources"]
+        bids = direct_config["resources"]["bids"]
+        assert bids["path"] == "/bids"
+        assert bids["method"] == "POST"
+        assert "methods" in bids
+        assert "get" in bids["methods"]
+        assert "set" in bids["methods"]
+        assert "setAuto" in bids["methods"]
+    
+    def test_keywordbids_resource(self, direct_config):
+        """Test keywordbids resource exists."""
+        assert "keywordbids" in direct_config["resources"]
+        keywordbids = direct_config["resources"]["keywordbids"]
+        assert keywordbids["path"] == "/keywordbids"
+        assert keywordbids["method"] == "POST"
+    
+    def test_bidmodifiers_resource(self, direct_config):
+        """Test bidmodifiers resource exists."""
+        assert "bidmodifiers" in direct_config["resources"]
+        bidmodifiers = direct_config["resources"]["bidmodifiers"]
+        assert bidmodifiers["path"] == "/bidmodifiers"
+        assert bidmodifiers["method"] == "POST"
+        assert "methods" in bidmodifiers
+        assert "add" in bidmodifiers["methods"]
+        assert "delete" in bidmodifiers["methods"]
+    
+    def test_negativekeywordsharedsets_resource(self, direct_config):
+        """Test negativekeywordsharedsets resource exists."""
+        assert "negativekeywordsharedsets" in direct_config["resources"]
+        nks = direct_config["resources"]["negativekeywordsharedsets"]
+        assert nks["path"] == "/negativekeywordsharedsets"
+        assert nks["method"] == "POST"
+    
+    def test_keywordsresearch_resource(self, direct_config):
+        """Test keywordsresearch resource exists."""
+        assert "keywordsresearch" in direct_config["resources"]
+        kr = direct_config["resources"]["keywordsresearch"]
+        assert kr["path"] == "/keywordsresearch"
+        assert kr["method"] == "POST"
+        assert "methods" in kr
+        assert "deduplicate" in kr["methods"]
+        assert "hasSearchVolume" in kr["methods"]
+    
+    def test_businesses_resource(self, direct_config):
+        """Test businesses resource exists."""
+        assert "businesses" in direct_config["resources"]
+        businesses = direct_config["resources"]["businesses"]
+        assert businesses["path"] == "/businesses"
+        assert businesses["method"] == "POST"
+    
+    def test_adimages_resource(self, direct_config):
+        """Test adimages resource exists."""
+        assert "adimages" in direct_config["resources"]
+        adimages = direct_config["resources"]["adimages"]
+        assert adimages["path"] == "/adimages"
+        assert adimages["method"] == "POST"
+        assert "methods" in adimages
+        assert "add" in adimages["methods"]
+        assert "delete" in adimages["methods"]
+    
+    def test_creatives_resource(self, direct_config):
+        """Test creatives resource exists."""
+        assert "creatives" in direct_config["resources"]
+        creatives = direct_config["resources"]["creatives"]
+        assert creatives["path"] == "/creatives"
+        assert creatives["method"] == "POST"
+    
+    def test_advideos_resource(self, direct_config):
+        """Test advideos resource exists."""
+        assert "advideos" in direct_config["resources"]
+        advideos = direct_config["resources"]["advideos"]
+        assert advideos["path"] == "/advideos"
+        assert advideos["method"] == "POST"
+    
+    def test_turbopages_resource(self, direct_config):
+        """Test turbopages resource exists."""
+        assert "turbopages" in direct_config["resources"]
+        turbopages = direct_config["resources"]["turbopages"]
+        assert turbopages["path"] == "/turbopages"
+        assert turbopages["method"] == "POST"
+    
+    def test_leads_resource(self, direct_config):
+        """Test leads resource exists."""
+        assert "leads" in direct_config["resources"]
+        leads = direct_config["resources"]["leads"]
+        assert leads["path"] == "/leads"
+        assert leads["method"] == "POST"
+    
+    def test_sitelinks_resource(self, direct_config):
+        """Test sitelinks resource exists."""
+        assert "sitelinks" in direct_config["resources"]
+        sitelinks = direct_config["resources"]["sitelinks"]
+        assert sitelinks["path"] == "/sitelinks"
+        assert sitelinks["method"] == "POST"
+        assert "methods" in sitelinks
+        assert "add" in sitelinks["methods"]
+        assert "delete" in sitelinks["methods"]
+    
+    def test_adextensions_resource(self, direct_config):
+        """Test adextensions resource exists."""
+        assert "adextensions" in direct_config["resources"]
+        adextensions = direct_config["resources"]["adextensions"]
+        assert adextensions["path"] == "/adextensions"
+        assert adextensions["method"] == "POST"
+    
+    def test_audiencetargets_resource(self, direct_config):
+        """Test audiencetargets resource exists."""
+        assert "audiencetargets" in direct_config["resources"]
+        at = direct_config["resources"]["audiencetargets"]
+        assert at["path"] == "/audiencetargets"
+        assert at["method"] == "POST"
+        assert "methods" in at
+        assert "add" in at["methods"]
+        assert "setBids" in at["methods"]
+    
+    def test_retargetinglists_resource(self, direct_config):
+        """Test retargetinglists resource exists."""
+        assert "retargetinglists" in direct_config["resources"]
+        rl = direct_config["resources"]["retargetinglists"]
+        assert rl["path"] == "/retargetinglists"
+        assert rl["method"] == "POST"
+    
+    def test_clients_resource(self, direct_config):
+        """Test clients resource exists."""
+        assert "clients" in direct_config["resources"]
+        clients = direct_config["resources"]["clients"]
+        assert clients["path"] == "/clients"
+        assert clients["method"] == "POST"
+        assert "methods" in clients
+        assert "get" in clients["methods"]
+        assert "update" in clients["methods"]
+    
+    def test_agencyclients_resource(self, direct_config):
+        """Test agencyclients resource exists."""
+        assert "agencyclients" in direct_config["resources"]
+        ac = direct_config["resources"]["agencyclients"]
+        assert ac["path"] == "/agencyclients"
+        assert ac["method"] == "POST"
+    
+    def test_feeds_resource(self, direct_config):
+        """Test feeds resource exists."""
+        assert "feeds" in direct_config["resources"]
+        feeds = direct_config["resources"]["feeds"]
+        assert feeds["path"] == "/feeds"
+        assert feeds["method"] == "POST"
+        assert "methods" in feeds
+        assert "add" in feeds["methods"]
+        assert "delete" in feeds["methods"]
+    
+    def test_dictionaries_resource(self, direct_config):
+        """Test dictionaries resource exists."""
+        assert "dictionaries" in direct_config["resources"]
+        dicts = direct_config["resources"]["dictionaries"]
+        assert dicts["path"] == "/dictionaries"
+        assert dicts["method"] == "POST"
+    
+    def test_changes_resource(self, direct_config):
+        """Test changes resource exists."""
+        assert "changes" in direct_config["resources"]
+        changes = direct_config["resources"]["changes"]
+        assert changes["path"] == "/changes"
+        assert changes["method"] == "POST"
+        assert "methods" in changes
+        assert "check" in changes["methods"]
+        assert "checkCampaigns" in changes["methods"]
+    
+    def test_strategies_resource(self, direct_config):
+        """Test strategies resource exists."""
+        assert "strategies" in direct_config["resources"]
+        strategies = direct_config["resources"]["strategies"]
+        assert strategies["path"] == "/strategies"
+        assert strategies["method"] == "POST"
+    
+    def test_accountlogins_resource(self, direct_config):
+        """Test accountlogins resource exists."""
+        assert "accountlogins" in direct_config["resources"]
+        al = direct_config["resources"]["accountlogins"]
+        assert al["path"] == "/accountlogins"
+        assert al["method"] == "POST"
+    
+    def test_balance_resource(self, direct_config):
+        """Test balance resource exists."""
+        assert "balance" in direct_config["resources"]
+        balance = direct_config["resources"]["balance"]
+        assert balance["path"] == "/balance"
+        assert balance["method"] == "POST"
+    
+    def test_units_resource(self, direct_config):
+        """Test units resource exists."""
+        assert "units" in direct_config["resources"]
+        units = direct_config["resources"]["units"]
+        assert units["path"] == "/units"
+        assert units["method"] == "POST"
+    
+    def test_grants_resource(self, direct_config):
+        """Test grants resource exists."""
+        assert "grants" in direct_config["resources"]
+        grants = direct_config["resources"]["grants"]
+        assert grants["path"] == "/grants"
+        assert grants["method"] == "POST"
+    
+    def test_all_resources_have_methods_or_method(self, direct_config):
+        """Test all resources have methods defined or a single method."""
+        for name, resource in direct_config["resources"].items():
+            has_methods = "methods" in resource and len(resource["methods"]) > 0
+            has_method = "method" in resource
+            assert has_methods or has_method, f"Resource {name} missing methods/method"
 
 
 class TestYandexDirectClient:
@@ -146,16 +371,23 @@ class TestYandexDirectClient:
         assert client is not None
         assert hasattr(client, "_adapter")
     
-    def test_client_has_resources(self, direct_config):
-        """Test client loads resources from config."""
+    def test_client_has_all_resources(self, direct_config):
+        """Test client loads all resources from config."""
         client = ApiForgeClient(config=direct_config)
         resources = client.list_resources()
         
-        assert "reports" in resources
-        assert "campaigns" in resources
-        assert "adgroups" in resources
-        assert "ads" in resources
-        assert "keywords" in resources
+        expected_resources = [
+            "reports", "campaigns", "adgroups", "ads", "keywords",
+            "bids", "keywordbids", "bidmodifiers", "negativekeywordsharedsets",
+            "keywordsresearch", "businesses", "adimages", "creatives",
+            "advideos", "turbopages", "leads", "sitelinks", "adextensions",
+            "audiencetargets", "retargetinglists", "clients", "agencyclients",
+            "feeds", "dictionaries", "changes", "strategies", "accountlogins",
+            "balance", "units", "grants"
+        ]
+        
+        for resource_name in expected_resources:
+            assert resource_name in resources, f"Missing resource: {resource_name}"
     
     def test_client_get_reports_resource(self, direct_config):
         """Test client can get reports resource."""
@@ -166,12 +398,39 @@ class TestYandexDirectClient:
         assert resource.path == "/reports"
         assert resource.method == "POST"
     
+    def test_client_get_campaigns_resource(self, direct_config):
+        """Test client can get campaigns resource."""
+        client = ApiForgeClient(config=direct_config)
+        resource = client.get_resource("campaigns")
+        
+        assert resource.name == "campaigns"
+        assert resource.path == "/campaigns"
+        assert resource.method == "POST"
+    
+    def test_client_get_ads_resource(self, direct_config):
+        """Test client can get ads resource."""
+        client = ApiForgeClient(config=direct_config)
+        resource = client.get_resource("ads")
+        
+        assert resource.name == "ads"
+        assert resource.path == "/ads"
+        assert resource.method == "POST"
+    
+    def test_client_get_keywords_resource(self, direct_config):
+        """Test client can get keywords resource."""
+        client = ApiForgeClient(config=direct_config)
+        resource = client.get_resource("keywords")
+        
+        assert resource.name == "keywords"
+        assert resource.path == "/keywords"
+        assert resource.method == "POST"
+    
     def test_client_context_manager(self, direct_config):
         """Test client works as context manager."""
         with ApiForgeClient(config=direct_config) as client:
             assert client is not None
             resources = client.list_resources()
-            assert len(resources) > 0
+            assert len(resources) >= 30  # We have at least 30 resources
 
 
 class TestYandexDirectConfigValidation:

@@ -22,24 +22,7 @@
         "SelectionCriteria": {
           "type": "object",
           "required": true,
-          "description": "Критерии отбора данных для отчета",
-          "properties": {
-            "DateFrom": {
-              "type": "string",
-              "required": false,
-              "description": "Начальная дата отчетного периода (YYYY-MM-DD). Обязательно при DateRangeType=CUSTOM_DATE"
-            },
-            "DateTo": {
-              "type": "string",
-              "required": false,
-              "description": "Конечная дата отчетного периода (YYYY-MM-DD). Обязательно при DateRangeType=CUSTOM_DATE"
-            },
-            "Filter": {
-              "type": "array",
-              "required": false,
-              "description": "Фильтры данных"
-            }
-          }
+          "description": "Критерии отбора данных для отчета"
         },
         "FieldNames": {
           "type": "array",
@@ -71,100 +54,72 @@
           "required": true,
           "description": "Период, за который формируется отчет",
           "enum": [
-            "TODAY",
-            "YESTERDAY",
-            "LAST_3_DAYS",
-            "LAST_5_DAYS",
-            "LAST_7_DAYS",
-            "LAST_14_DAYS",
-            "LAST_30_DAYS",
-            "LAST_90_DAYS",
-            "LAST_365_DAYS",
-            "THIS_WEEK_MON_TODAY",
-            "THIS_WEEK_SUN_TODAY",
-            "LAST_WEEK",
-            "LAST_BUSINESS_WEEK",
-            "LAST_WEEK_SUN_SAT",
-            "THIS_MONTH",
-            "LAST_MONTH",
-            "ALL_TIME",
-            "CUSTOM_DATE",
-            "AUTO"
+            "TODAY", "YESTERDAY", "LAST_3_DAYS", "LAST_5_DAYS",
+            "LAST_7_DAYS", "LAST_14_DAYS", "LAST_30_DAYS", "LAST_90_DAYS",
+            "LAST_365_DAYS", "THIS_WEEK_MON_TODAY", "THIS_WEEK_SUN_TODAY",
+            "LAST_WEEK", "LAST_BUSINESS_WEEK", "LAST_WEEK_SUN_SAT",
+            "THIS_MONTH", "LAST_MONTH", "ALL_TIME", "CUSTOM_DATE", "AUTO"
           ]
         },
         "Format": {
           "type": "string",
           "required": true,
-          "description": "Формат отчета. В настоящее время поддерживается только TSV",
+          "description": "Формат отчета (только TSV)",
           "enum": ["TSV"]
         },
         "IncludeVAT": {
           "type": "string",
           "required": true,
-          "description": "Включать ли НДС в денежные суммы в отчете",
+          "description": "Включать ли НДС в денежные суммы",
           "enum": ["YES", "NO"]
         },
         "IncludeDiscount": {
           "type": "string",
           "required": false,
-          "description": "Учитывать ли скидку для денежных сумм в отчете. Утратил актуальность с 1 сентября 2015 года",
+          "description": "Учитывать ли скидку (устарело с 01.09.2015)",
           "enum": ["YES", "NO"]
         },
         "Goals": {
           "type": "array",
           "required": false,
-          "description": "Идентификаторы целей Яндекс Метрики (не более 10 элементов)"
+          "description": "Идентификаторы целей Яндекс Метрики (не более 10)"
         },
         "AttributionModels": {
           "type": "array",
           "required": false,
-          "description": "Модели атрибуции для расчета данных по целям Яндекс Метрики",
+          "description": "Модели атрибуции",
           "enum": ["FCCD", "LC", "LSCCD", "AUTO"]
         },
         "Page": {
           "type": "object",
           "required": false,
-          "description": "Ограничение на количество строк в отчете (максимум 1 000 000)",
+          "description": "Ограничение на количество строк (максимум 1 000 000)",
           "properties": {
-            "Limit": {
-              "type": "integer",
-              "required": true,
-              "description": "Максимальное количество строк в отчете"
-            },
-            "Offset": {
-              "type": "integer",
-              "required": false,
-              "description": "Количество строк, которое должно быть пропущено при выборке"
-            }
+            "Limit": {"type": "integer", "required": true},
+            "Offset": {"type": "integer", "required": false}
           }
         },
         "OrderBy": {
           "type": "array",
           "required": false,
-          "description": "Сортировка строк в отчете",
-          "items": {
-            "type": "object",
-            "properties": {
-              "Field": {
-                "type": "string",
-                "required": true,
-                "description": "Имя поля для сортировки"
-              },
-              "SortOrder": {
-                "type": "string",
-                "required": false,
-                "description": "Направление сортировки",
-                "enum": ["ASCENDING", "DESCENDING"]
-              }
-            }
-          }
+          "description": "Сортировка строк в отчете"
         }
       }
     },
     "campaigns": {
       "path": "/campaigns",
-      "method": "GET",
-      "description": "Получение списка кампаний",
+      "method": "POST",
+      "description": "Управление кампаниями",
+      "methods": {
+        "add": {"method": "POST", "description": "Добавление кампаний"},
+        "delete": {"method": "POST", "description": "Удаление кампаний"},
+        "get": {"method": "POST", "description": "Получение параметров кампаний"},
+        "update": {"method": "POST", "description": "Изменение параметров кампаний"},
+        "archive": {"method": "POST", "description": "Архивация кампаний"},
+        "unarchive": {"method": "POST", "description": "Разархивация кампаний"},
+        "resume": {"method": "POST", "description": "Возобновление показов"},
+        "suspend": {"method": "POST", "description": "Приостановка показов"}
+      },
       "parameters": {
         "selection": {
           "type": "object",
@@ -179,26 +134,20 @@
         "page": {
           "type": "object",
           "required": false,
-          "description": "Параметры пагинации",
-          "properties": {
-            "limit": {
-              "type": "integer",
-              "required": true,
-              "description": "Максимальное количество кампаний"
-            },
-            "offset": {
-              "type": "integer",
-              "required": false,
-              "description": "Смещение"
-            }
-          }
+          "description": "Параметры пагинации"
         }
       }
     },
     "adgroups": {
       "path": "/adgroups",
-      "method": "GET",
-      "description": "Получение списка групп объявлений",
+      "method": "POST",
+      "description": "Управление группами объявлений",
+      "methods": {
+        "add": {"method": "POST", "description": "Добавление групп объявлений"},
+        "delete": {"method": "POST", "description": "Удаление групп объявлений"},
+        "get": {"method": "POST", "description": "Получение параметров групп объявлений"},
+        "update": {"method": "POST", "description": "Изменение параметров групп объявлений"}
+      },
       "parameters": {
         "selection": {
           "type": "object",
@@ -219,8 +168,19 @@
     },
     "ads": {
       "path": "/ads",
-      "method": "GET",
-      "description": "Получение списка объявлений",
+      "method": "POST",
+      "description": "Управление объявлениями",
+      "methods": {
+        "add": {"method": "POST", "description": "Добавление объявлений"},
+        "delete": {"method": "POST", "description": "Удаление объявлений"},
+        "get": {"method": "POST", "description": "Получение параметров объявлений"},
+        "update": {"method": "POST", "description": "Изменение параметров объявлений"},
+        "archive": {"method": "POST", "description": "Архивация объявлений"},
+        "unarchive": {"method": "POST", "description": "Разархивация объявлений"},
+        "resume": {"method": "POST", "description": "Возобновление показов"},
+        "suspend": {"method": "POST", "description": "Приостановка показов"},
+        "moderate": {"method": "POST", "description": "Отправка объявлений на модерацию"}
+      },
       "parameters": {
         "selection": {
           "type": "object",
@@ -241,8 +201,16 @@
     },
     "keywords": {
       "path": "/keywords",
-      "method": "GET",
-      "description": "Получение списка ключевых фраз",
+      "method": "POST",
+      "description": "Управление ключевыми фразами и автотаргетингами",
+      "methods": {
+        "add": {"method": "POST", "description": "Добавление ключевых фраз"},
+        "delete": {"method": "POST", "description": "Удаление ключевых фраз"},
+        "get": {"method": "POST", "description": "Получение параметров ключевых фраз"},
+        "update": {"method": "POST", "description": "Изменение параметров ключевых фраз"},
+        "resume": {"method": "POST", "description": "Возобновление показов"},
+        "suspend": {"method": "POST", "description": "Приостановка показов"}
+      },
       "parameters": {
         "selection": {
           "type": "object",
@@ -261,164 +229,15 @@
         }
       }
     },
-    "adcasts": {
-      "path": "/adcasts",
-      "method": "GET",
-      "description": "Получение списка креативов видеорекламы",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора креативов"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "feeds": {
-      "path": "/feeds",
-      "method": "GET",
-      "description": "Получение списка фидов",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора фидов"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "dynamicadtargets": {
-      "path": "/dynamicadtargets",
-      "method": "GET",
-      "description": "Получение списка условий нацеливания для динамических объявлений",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора условий"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "sites": {
-      "path": "/sites",
-      "method": "GET",
-      "description": "Получение списка посадочных страниц",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора страниц"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "agencyclients": {
-      "path": "/agencyclients",
-      "method": "GET",
-      "description": "Получение списка клиентов агентства",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора клиентов"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "audiencetargets": {
-      "path": "/audiencetargets",
-      "method": "GET",
-      "description": "Получение списка условий нацеливания на аудиторию",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора условий"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "retargetinglists": {
-      "path": "/retargetinglists",
-      "method": "GET",
-      "description": "Получение списка списков ретаргетинга",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора списков"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "bidssuggestions": {
-      "path": "/bidssuggestions",
-      "method": "GET",
-      "description": "Получение рекомендаций по ставкам",
+    "bids": {
+      "path": "/bids",
+      "method": "POST",
+      "description": "Управление ставками",
+      "methods": {
+        "get": {"method": "POST", "description": "Получение ставок"},
+        "set": {"method": "POST", "description": "Установка ставок"},
+        "setAuto": {"method": "POST", "description": "Автоматическое управление ставками"}
+      },
       "parameters": {
         "selection": {
           "type": "object",
@@ -429,18 +248,18 @@
           "type": "array",
           "required": true,
           "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
         }
       }
     },
-    "suggests": {
-      "path": "/suggests",
-      "method": "GET",
-      "description": "Получение подсказок для ключевых фраз",
+    "keywordbids": {
+      "path": "/keywordbids",
+      "method": "POST",
+      "description": "Управление ставками по ключевым фразам",
+      "methods": {
+        "get": {"method": "POST", "description": "Получение ставок"},
+        "set": {"method": "POST", "description": "Установка ставок"},
+        "setAuto": {"method": "POST", "description": "Автоматическое управление ставками"}
+      },
       "parameters": {
         "selection": {
           "type": "object",
@@ -451,18 +270,78 @@
           "type": "array",
           "required": true,
           "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
         }
       }
     },
-    "rubrics": {
-      "path": "/rubrics",
-      "method": "GET",
-      "description": "Получение списка рубрик",
+    "bidmodifiers": {
+      "path": "/bidmodifiers",
+      "method": "POST",
+      "description": "Управление корректировками ставок",
+      "methods": {
+        "add": {"method": "POST", "description": "Добавление корректировок"},
+        "delete": {"method": "POST", "description": "Удаление корректировок"},
+        "get": {"method": "POST", "description": "Получение корректировок"},
+        "set": {"method": "POST", "description": "Установка корректировок"}
+      },
+      "parameters": {
+        "selection": {
+          "type": "object",
+          "required": false,
+          "description": "Критерии отбора"
+        },
+        "fieldNames": {
+          "type": "array",
+          "required": true,
+          "description": "Имена полей для включения в ответ"
+        }
+      }
+    },
+    "negativekeywordsharedsets": {
+      "path": "/negativekeywordsharedsets",
+      "method": "POST",
+      "description": "Управление наборами минус-фраз",
+      "methods": {
+        "add": {"method": "POST", "description": "Добавление наборов"},
+        "delete": {"method": "POST", "description": "Удаление наборов"},
+        "get": {"method": "POST", "description": "Получение наборов"},
+        "update": {"method": "POST", "description": "Изменение наборов"}
+      },
+      "parameters": {
+        "selection": {
+          "type": "object",
+          "required": false,
+          "description": "Критерии отбора"
+        },
+        "fieldNames": {
+          "type": "array",
+          "required": true,
+          "description": "Имена полей для включения в ответ"
+        }
+      }
+    },
+    "keywordsresearch": {
+      "path": "/keywordsresearch",
+      "method": "POST",
+      "description": "Предобработка ключевых фраз",
+      "methods": {
+        "deduplicate": {"method": "POST", "description": "Дедупликация ключевых фраз"},
+        "hasSearchVolume": {"method": "POST", "description": "Проверка наличия объема поиска"}
+      },
+      "parameters": {
+        "keywords": {
+          "type": "array",
+          "required": true,
+          "description": "Список ключевых фраз"
+        }
+      }
+    },
+    "businesses": {
+      "path": "/businesses",
+      "method": "POST",
+      "description": "Получение профилей организаций",
+      "methods": {
+        "get": {"method": "POST", "description": "Получение профилей"}
+      },
       "parameters": {
         "selection": {
           "type": "object",
@@ -483,8 +362,13 @@
     },
     "adimages": {
       "path": "/adimages",
-      "method": "GET",
-      "description": "Получение списка изображений объявлений",
+      "method": "POST",
+      "description": "Операции с изображениями",
+      "methods": {
+        "add": {"method": "POST", "description": "Добавление изображений"},
+        "delete": {"method": "POST", "description": "Удаление изображений"},
+        "get": {"method": "POST", "description": "Получение изображений"}
+      },
       "parameters": {
         "selection": {
           "type": "object",
@@ -503,10 +387,14 @@
         }
       }
     },
-    "adtemplates": {
-      "path": "/adtemplates",
-      "method": "GET",
-      "description": "Получение списка шаблонов объявлений",
+    "creatives": {
+      "path": "/creatives",
+      "method": "POST",
+      "description": "Получение креативов",
+      "methods": {
+        "add": {"method": "POST", "description": "Добавление креативов"},
+        "get": {"method": "POST", "description": "Получение креативов"}
+      },
       "parameters": {
         "selection": {
           "type": "object",
@@ -525,10 +413,14 @@
         }
       }
     },
-    "changes": {
-      "path": "/changes",
-      "method": "GET",
-      "description": "Получение информации об изменениях в аккаунте",
+    "advideos": {
+      "path": "/advideos",
+      "method": "POST",
+      "description": "Операции с видео",
+      "methods": {
+        "add": {"method": "POST", "description": "Добавление видео"},
+        "get": {"method": "POST", "description": "Получение видео"}
+      },
       "parameters": {
         "selection": {
           "type": "object",
@@ -547,10 +439,13 @@
         }
       }
     },
-    "accountlogins": {
-      "path": "/accountlogins",
-      "method": "GET",
-      "description": "Получение списка логинов, связанных с аккаунтом",
+    "turbopages": {
+      "path": "/turbopages",
+      "method": "POST",
+      "description": "Получение параметров Турбо-страниц",
+      "methods": {
+        "get": {"method": "POST", "description": "Получение параметров"}
+      },
       "parameters": {
         "selection": {
           "type": "object",
@@ -569,538 +464,13 @@
         }
       }
     },
-    "clients": {
-      "path": "/clients",
-      "method": "GET",
-      "description": "Получение информации о клиентах",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "grants": {
-      "path": "/grants",
-      "method": "GET",
-      "description": "Получение списка грантов",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "balance": {
-      "path": "/balance",
-      "method": "GET",
-      "description": "Получение информации о балансе",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "units": {
-      "path": "/units",
-      "method": "GET",
-      "description": "Получение информации об использовании баллов",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "treemarks": {
-      "path": "/treemarks",
-      "method": "GET",
-      "description": "Получение списка меток дерева",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "contentguarantees": {
-      "path": "/contentguarantees",
-      "method": "GET",
-      "description": "Получение информации о гарантиях контента",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "turboadaptives": {
-      "path": "/turboadaptives",
-      "method": "GET",
-      "description": "Получение списка Турбо-страниц",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "leadforms": {
-      "path": "/leadforms",
-      "method": "GET",
-      "description": "Получение списка форм для сбора лидов",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "logsevents": {
-      "path": "/logsevents",
-      "method": "GET",
-      "description": "Получение журнала изменений",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "operationalnorms": {
-      "path": "/operationalnorms",
-      "method": "GET",
-      "description": "Получение информации о нормах работы",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "keywordbids": {
-      "path": "/keywordbids",
-      "method": "GET",
-      "description": "Получение ставок по ключевым фразам",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "keywordfeatures": {
-      "path": "/keywordfeatures",
-      "method": "GET",
-      "description": "Получение характеристик ключевых фраз",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "keywordpresets": {
-      "path": "/keywordpresets",
-      "method": "GET",
-      "description": "Получение пресетов ключевых фраз",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "keywordstats": {
-      "path": "/keywordstats",
-      "method": "GET",
-      "description": "Получение статистики по ключевым фразам",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "keywordvalues": {
-      "path": "/keywordvalues",
-      "method": "GET",
-      "description": "Получение значений ключевых фраз",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "keywordvaluesforwebsite": {
-      "path": "/keywordvaluesforwebsite",
-      "method": "GET",
-      "description": "Получение значений ключевых фраз для сайта",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "mobileapptargeting": {
-      "path": "/mobileapptargeting",
-      "method": "GET",
-      "description": "Получение информации о нацеливании на мобильные приложения",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "mediaresources": {
-      "path": "/mediaresources",
-      "method": "GET",
-      "description": "Получение списка медиаресурсов",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "mediaplans": {
-      "path": "/mediaplans",
-      "method": "GET",
-      "description": "Получение списка медиапланов",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "targetings": {
-      "path": "/targetings",
-      "method": "GET",
-      "description": "Получение информации о нацеливании",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "creativepreview": {
-      "path": "/creativepreview",
-      "method": "GET",
-      "description": "Получение превью креатива",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "advcampaigns": {
-      "path": "/advcampaigns",
-      "method": "GET",
-      "description": "Получение списка рекламных кампаний",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "autogenbanners": {
-      "path": "/autogenbanners",
-      "method": "GET",
-          "description": "Получение списка автогенерируемых баннеров",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "autobanners": {
-      "path": "/autobanners",
-      "method": "GET",
-      "description": "Получение списка автоматических баннеров",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "vcards": {
-      "path": "/vcards",
-      "method": "GET",
-      "description": "Получение списка визиток",
+    "leads": {
+      "path": "/leads",
+      "method": "POST",
+      "description": "Получение данных из форм на Турбо-страницах",
+      "methods": {
+        "get": {"method": "POST", "description": "Получение данных"}
+      },
       "parameters": {
         "selection": {
           "type": "object",
@@ -1121,8 +491,13 @@
     },
     "sitelinks": {
       "path": "/sitelinks",
-      "method": "GET",
-      "description": "Получение списка быстрых ссылок",
+      "method": "POST",
+      "description": "Операции с быстрыми ссылками",
+      "methods": {
+        "add": {"method": "POST", "description": "Добавление быстрых ссылок"},
+        "delete": {"method": "POST", "description": "Удаление быстрых ссылок"},
+        "get": {"method": "POST", "description": "Получение быстрых ссылок"}
+      },
       "parameters": {
         "selection": {
           "type": "object",
@@ -1141,10 +516,15 @@
         }
       }
     },
-    "callouts": {
-      "path": "/callouts",
-      "method": "GET",
-      "description": "Получение списка уточнений",
+    "adextensions": {
+      "path": "/adextensions",
+      "method": "POST",
+      "description": "Операции с расширениями объявлений",
+      "methods": {
+        "add": {"method": "POST", "description": "Добавление расширений"},
+        "delete": {"method": "POST", "description": "Удаление расширений"},
+        "get": {"method": "POST", "description": "Получение расширений"}
+      },
       "parameters": {
         "selection": {
           "type": "object",
@@ -1163,10 +543,18 @@
         }
       }
     },
-    "businesses": {
-      "path": "/businesses",
-      "method": "GET",
-      "description": "Получение списка бизнесов",
+    "audiencetargets": {
+      "path": "/audiencetargets",
+      "method": "POST",
+      "description": "Управление условиями нацеливания на аудиторию",
+      "methods": {
+        "add": {"method": "POST", "description": "Добавление условий"},
+        "delete": {"method": "POST", "description": "Удаление условий"},
+        "get": {"method": "POST", "description": "Получение условий"},
+        "resume": {"method": "POST", "description": "Возобновление показов"},
+        "setBids": {"method": "POST", "description": "Установка ставок"},
+        "suspend": {"method": "POST", "description": "Приостановка показов"}
+      },
       "parameters": {
         "selection": {
           "type": "object",
@@ -1185,10 +573,16 @@
         }
       }
     },
-    "businessesassortments": {
-      "path": "/businessesassortments",
-      "method": "GET",
-      "description": "Получение списка ассортиментов бизнесов",
+    "retargetinglists": {
+      "path": "/retargetinglists",
+      "method": "POST",
+      "description": "Управление условиями ретаргетинга и подбора аудитории",
+      "methods": {
+        "add": {"method": "POST", "description": "Добавление условий"},
+        "delete": {"method": "POST", "description": "Удаление условий"},
+        "get": {"method": "POST", "description": "Получение условий"},
+        "update": {"method": "POST", "description": "Изменение условий"}
+      },
       "parameters": {
         "selection": {
           "type": "object",
@@ -1207,10 +601,14 @@
         }
       }
     },
-    "businessesbusinesses": {
-      "path": "/businessesbusinesses",
-      "method": "GET",
-      "description": "Получение списка бизнесов для бизнесов",
+    "clients": {
+      "path": "/clients",
+      "method": "POST",
+      "description": "Управление параметрами рекламодателя и настройками пользователя",
+      "methods": {
+        "get": {"method": "POST", "description": "Получение параметров"},
+        "update": {"method": "POST", "description": "Изменение параметров"}
+      },
       "parameters": {
         "selection": {
           "type": "object",
@@ -1229,10 +627,15 @@
         }
       }
     },
-    "businessesproducts": {
-      "path": "/businessesproducts",
-      "method": "GET",
-      "description": "Получение списка товаров бизнесов",
+    "agencyclients": {
+      "path": "/agencyclients",
+      "method": "POST",
+      "description": "Управление клиентами агентства",
+      "methods": {
+        "add": {"method": "POST", "description": "Добавление клиентов"},
+        "get": {"method": "POST", "description": "Получение клиентов"},
+        "update": {"method": "POST", "description": "Изменение клиентов"}
+      },
       "parameters": {
         "selection": {
           "type": "object",
@@ -1251,10 +654,16 @@
         }
       }
     },
-    "businessessources": {
-      "path": "/businessessources",
-      "method": "GET",
-      "description": "Получение списка источников бизнесов",
+    "feeds": {
+      "path": "/feeds",
+      "method": "POST",
+      "description": "Операции с фидами",
+      "methods": {
+        "add": {"method": "POST", "description": "Добавление фидов"},
+        "delete": {"method": "POST", "description": "Удаление фидов"},
+        "get": {"method": "POST", "description": "Получение фидов"},
+        "update": {"method": "POST", "description": "Изменение фидов"}
+      },
       "parameters": {
         "selection": {
           "type": "object",
@@ -1273,32 +682,30 @@
         }
       }
     },
-    "businessessuppliers": {
-      "path": "/businessessuppliers",
-      "method": "GET",
-      "description": "Получение списка поставщиков бизнесов",
+    "dictionaries": {
+      "path": "/dictionaries",
+      "method": "POST",
+      "description": "Получение справочных данных",
+      "methods": {
+        "get": {"method": "POST", "description": "Получение справочных данных"}
+      },
       "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
+        "dictionaryNames": {
           "type": "array",
           "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
+          "description": "Имена справочников"
         }
       }
     },
-    "businessessupplierssources": {
-      "path": "/businessessupplierssources",
-      "method": "GET",
-      "description": "Получение списка источников поставщиков бизнесов",
+    "changes": {
+      "path": "/changes",
+      "method": "POST",
+      "description": "Проверка наличия изменений",
+      "methods": {
+        "check": {"method": "POST", "description": "Проверка изменений"},
+        "checkCampaigns": {"method": "POST", "description": "Проверка изменений в кампаниях"},
+        "checkDictionaries": {"method": "POST", "description": "Проверка изменений в справочниках"}
+      },
       "parameters": {
         "selection": {
           "type": "object",
@@ -1309,18 +716,17 @@
           "type": "array",
           "required": true,
           "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
         }
       }
     },
-    "businessessupplierssourcesbusinesses": {
-      "path": "/businessessupplierssourcesbusinesses",
-      "method": "GET",
-      "description": "Получение списка бизнесов для источников поставщиков бизнесов",
+    "strategies": {
+      "path": "/strategies",
+      "method": "POST",
+      "description": "Операции с пакетными стратегиями",
+      "methods": {
+        "get": {"method": "POST", "description": "Получение стратегий"},
+        "set": {"method": "POST", "description": "Установка стратегий"}
+      },
       "parameters": {
         "selection": {
           "type": "object",
@@ -1331,121 +737,66 @@
           "type": "array",
           "required": true,
           "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
         }
       }
     },
-    "businessessupplierssourcesbusinessesproducts": {
-      "path": "/businessessupplierssourcesbusinessesproducts",
-      "method": "GET",
-      "description": "Получение списка товаров для бизнесов для источников поставщиков бизнесов",
+    "accountlogins": {
+      "path": "/accountlogins",
+      "method": "POST",
+      "description": "Получение списка логинов, связанных с аккаунтом",
+      "methods": {
+        "get": {"method": "POST", "description": "Получение логинов"}
+      },
       "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
         "fieldNames": {
           "type": "array",
           "required": true,
           "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
         }
       }
     },
-    "businessessupplierssourcesproducts": {
-      "path": "/businessessupplierssourcesproducts",
-      "method": "GET",
-      "description": "Получение списка товаров для источников поставщиков бизнесов",
+    "balance": {
+      "path": "/balance",
+      "method": "POST",
+      "description": "Получение информации о балансе",
+      "methods": {
+        "get": {"method": "POST", "description": "Получение баланса"}
+      },
       "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
         "fieldNames": {
           "type": "array",
           "required": true,
           "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
         }
       }
     },
-    "businessessupplierstargets": {
-      "path": "/businessessupplierstargets",
-      "method": "GET",
-      "description": "Получение списка целей поставщиков бизнесов",
+    "units": {
+      "path": "/units",
+      "method": "POST",
+      "description": "Получение информации об использовании баллов",
+      "methods": {
+        "get": {"method": "POST", "description": "Получение информации"}
+      },
       "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
         "fieldNames": {
           "type": "array",
           "required": true,
           "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
         }
       }
     },
-    "businessessupplierstargetsbusinesses": {
-      "path": "/businessessupplierstargetsbusinesses",
-      "method": "GET",
-      "description": "Получение списка бизнесов для целей поставщиков бизнесов",
+    "grants": {
+      "path": "/grants",
+      "method": "POST",
+      "description": "Получение списка грантов",
+      "methods": {
+        "get": {"method": "POST", "description": "Получение грантов"}
+      },
       "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
         "fieldNames": {
           "type": "array",
           "required": true,
           "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
-        }
-      }
-    },
-    "businessessupplierstargetsproducts": {
-      "path": "/businessessupplierstargetsproducts",
-      "method": "GET",
-      "description": "Получение списка товаров для целей поставщиков бизнесов",
-      "parameters": {
-        "selection": {
-          "type": "object",
-          "required": false,
-          "description": "Критерии отбора"
-        },
-        "fieldNames": {
-          "type": "array",
-          "required": true,
-          "description": "Имена полей для включения в ответ"
-        },
-        "page": {
-          "type": "object",
-          "required": false,
-          "description": "Параметры пагинации"
         }
       }
     }
