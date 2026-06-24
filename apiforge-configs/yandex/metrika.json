@@ -1,0 +1,126 @@
+{
+  "base_url": "https://api-metrika.yandex.net",
+  "auth": {
+    "token": "YOUR_OAUTH_TOKEN"
+  },
+  "default_headers": {
+    "Content-Type": "application/json"
+  },
+  "resources": {
+    "stats": {
+      "path": "/stat/v1/data",
+      "method": "GET",
+      "description": "Get statistics data",
+      "parameters": {
+        "ids": {
+          "type": "integer",
+          "required": true,
+          "description": "Counter ID"
+        },
+        "metrics": {
+          "type": "string",
+          "required": true,
+          "description": "Metrics to retrieve"
+        },
+        "dimensions": {
+          "type": "string",
+          "required": false,
+          "description": "Dimensions to group by"
+        },
+        "date1": {
+          "type": "string",
+          "required": false,
+          "description": "Start date (YYYY-MM-DD)"
+        },
+        "date2": {
+          "type": "string",
+          "required": false,
+          "description": "End date (YYYY-MM-DD)"
+        },
+        "limit": {
+          "type": "integer",
+          "required": false,
+          "description": "Number of results to return"
+        },
+        "offset": {
+          "type": "integer",
+          "required": false,
+          "description": "Offset for pagination"
+        }
+      }
+    },
+    "counters": {
+      "path": "/management/v1/counters",
+      "method": "GET",
+      "description": "List counters"
+    },
+    "counter_info": {
+      "path": "/management/v1/counter/{counter_id}",
+      "method": "GET",
+      "description": "Get counter info",
+      "parameters": {
+        "counter_id": {
+          "type": "integer",
+          "required": true,
+          "description": "Counter ID"
+        }
+      }
+    },
+    "goals": {
+      "path": "/management/v1/counter/{counter_id}/goals",
+      "method": "GET",
+      "description": "List goals for counter",
+      "parameters": {
+        "counter_id": {
+          "type": "integer",
+          "required": true,
+          "description": "Counter ID"
+        }
+      }
+    },
+    "segments": {
+      "path": "/segment/v2/segments",
+      "method": "GET",
+      "description": "List segments"
+    },
+    "logs": {
+      "path": "/management/v1/counter/{counter_id}/logrequests",
+      "method": "GET",
+      "description": "List log requests",
+      "parameters": {
+        "counter_id": {
+          "type": "integer",
+          "required": true,
+          "description": "Counter ID"
+        }
+      }
+    },
+    "create_log": {
+      "path": "/management/v1/counter/{counter_id}/logrequests",
+      "method": "POST",
+      "description": "Create log request",
+      "parameters": {
+        "counter_id": {
+          "type": "integer",
+          "required": true,
+          "description": "Counter ID"
+        },
+        "date1": {
+          "type": "string",
+          "required": true,
+          "description": "Start date"
+        },
+        "date2": {
+          "type": "string",
+          "required": true,
+          "description": "End date"
+        },
+        "fields": {
+          "type": "string",
+          "required": true,
+          "description": "Fields to retrieve"
+        }
+      }
+    }
+  }
+}

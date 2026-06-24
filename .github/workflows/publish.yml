@@ -1,0 +1,50 @@
+name: Publish to PyPI
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.12"
+    
+    - name: Install build dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine
+    
+    - name: Verify version
+      run: |
+        # Extract version from pyproject.toml
+        CURRENT_VERSION=$(grep -E "^\s*version" pyproject.toml | head -1 | cut -d'"' -f2)
+        TAG_VERSION=${GITHUB_REF#refs/tags/v}
+        
+        echo "Current version in pyproject.toml: $CURRENT_VERSION"
+        echo "Tag version: $TAG_VERSION"
+        
+        if [ "$CURRENT_VERSION" != "$TAG_VERSION" ]; then
+          echo "ERROR: Version mismatch between pyproject.toml and tag"
+          echo "pyproject.toml version: $CURRENT_VERSION"
+          echo "Tag version: $TAG_VERSION"
+          exit 1
+        fi
+    
+    - name: Build package
+      run: |
+        python -m build
+    
+    - name: Publish to PyPI
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      run: |
+        twine upload dist/*

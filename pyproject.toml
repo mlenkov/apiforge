@@ -1,0 +1,97 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "apiforge"
+version = "0.1.0"
+description = "Modern Python API Client Generator from JSON Configs"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "ApiForge Contributors" },
+]
+keywords = ["api", "client", "generator", "json", "rest"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "requests>=2.28.0",
+    "jsonschema>=4.0.0",
+]
+
+[project.optional-dependencies]
+async = [
+    "httpx>=0.24.0",
+]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+]
+
+[project.scripts]
+apiforge = "apiforge.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/apiforge/apiforge"
+Documentation = "https://github.com/apiforge/apiforge#readme"
+Repository = "https://github.com/apiforge/apiforge"
+Issues = "https://github.com/apiforge/apiforge/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["apiforge"]
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.coverage.run]
+source = ["apiforge"]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.",
+    "pass",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+fail_under = 70
