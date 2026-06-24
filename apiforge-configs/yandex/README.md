@@ -248,6 +248,65 @@ Complete configuration for Yandex Webmaster API.
 
 ---
 
+### admetrica.json
+
+Complete configuration for Yandex AdMetrica (Метрика для медийной рекламы) API.
+
+#### Campaigns
+| Resource | Method | Description |
+|----------|--------|-------------|
+| `campaigns` | GET | Список кампаний |
+| `campaign` | GET | Информация о кампании |
+| `campaign_create` | POST | Создание кампании |
+| `campaign_update` | PUT | Изменение кампании |
+| `campaign_delete` | DELETE | Удаление кампании |
+| `campaign_copy` | POST | Копирование кампании |
+
+#### Advertisers
+| Resource | Method | Description |
+|----------|--------|-------------|
+| `advertisers` | GET | Список рекламодателей |
+| `advertiser` | GET | Информация о рекламодателе |
+| `advertiser_create` | POST | Создание рекламодателя |
+| `advertiser_update` | PUT | Изменение рекламодателя |
+| `advertiser_delete` | DELETE | Удаление рекламодателя |
+
+#### Goals
+| Resource | Method | Description |
+|----------|--------|-------------|
+| `goals` | GET | Список целей |
+| `goal` | GET | Информация о цели |
+| `goal_create` | POST | Создание цели |
+| `goal_update` | PUT | Изменение цели |
+| `goal_delete` | DELETE | Удаление цели |
+
+#### Landing Pages
+| Resource | Method | Description |
+|----------|--------|-------------|
+| `landing_pages` | GET | Список посадочных страниц |
+| `landing_page` | GET | Информация о посадочной странице |
+| `landing_page_create` | POST | Создание посадочной страницы |
+| `landing_page_update` | PUT | Изменение посадочной страницы |
+| `landing_page_delete` | DELETE | Удаление посадочной страницы |
+
+#### Grants
+| Resource | Method | Description |
+|----------|--------|-------------|
+| `grants` | GET | Список доступов |
+| `grant_create` | POST | Создание доступа |
+| `grant_delete` | DELETE | Удаление доступа |
+
+#### Statistics
+| Resource | Method | Description |
+|----------|--------|-------------|
+| `stat_data` | GET | Таблица данных |
+| `stat_data_drilldown` | GET | Древовидный отчет |
+| `stat_data_bytime` | GET | Данные по времени |
+| `stat_summary` | GET | Сводка по кампаниям |
+| `stat_comparison` | GET | Сравнение сегментов |
+
+---
+
 ## Setup
 
 ### 1. Get OAuth Token
@@ -268,6 +327,9 @@ export YANDEX_DIRECT_CLIENT_LOGIN="your-login"  # Optional
 
 # For Webmaster
 export YANDEX_WEBMASTER_TOKEN="your-oauth-token"
+
+# For AdMetrica
+export YANDEX_ADMETRICA_TOKEN="your-oauth-token"
 ```
 
 ### 3. Use the Configuration
@@ -283,6 +345,9 @@ client = ApiForgeClient(config_path="apiforge-configs/yandex/direct.json")
 
 # Webmaster
 client = ApiForgeClient(config_path="apiforge-configs/yandex/webmaster.json")
+
+# AdMetrica
+client = ApiForgeClient(config_path="apiforge-configs/yandex/admetrica.json")
 ```
 
 ## Examples
@@ -294,3 +359,4 @@ See [examples/](../../examples/) directory for complete usage examples.
 - [Yandex Metrika API](https://yandex.ru/dev/metrika/)
 - [Yandex Direct API](https://yandex.ru/dev/direct/doc/ru/concepts/overview)
 - [Yandex Webmaster API](https://yandex.ru/dev/webmaster/doc/ru/concepts/getting-started)
+- [Yandex AdMetrica API](https://yandex.ru/dev/admetrica/doc/ru/)
