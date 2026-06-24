@@ -165,6 +165,89 @@ Complete configuration for Yandex Direct API with 30+ services.
 
 ---
 
+### webmaster.json
+
+Complete configuration for Yandex Webmaster API.
+
+#### User
+| Resource | Method | Description |
+|----------|--------|-------------|
+| `user` | GET | Получение идентификатора пользователя |
+
+#### Sites (Hosts)
+| Resource | Method | Description |
+|----------|--------|-------------|
+| `hosts` | GET | Список сайтов пользователя |
+| `host_add` | POST | Добавление сайта |
+| `host` | GET | Информация о сайте |
+| `host_delete` | DELETE | Удаление сайта |
+| `host_summary` | GET | Статистика сайта |
+| `host_important_urls` | GET | Мониторинг важных страниц |
+| `host_important_urls_history` | GET | История изменений важной страницы |
+
+#### Verification
+| Resource | Method | Description |
+|----------|--------|-------------|
+| `host_verification` | GET | Информация о подтверждении сайта |
+| `host_verification_start` | POST | Запуск подтверждения прав |
+| `host_owners` | GET | Список владельцев сайта |
+
+#### Sitemaps
+| Resource | Method | Description |
+|----------|--------|-------------|
+| `host_sitemaps` | GET | Список файлов Sitemap |
+| `host_sitemap` | GET | Информация о Sitemap |
+| `host_user_added_sitemaps` | GET | Список пользовательских Sitemap |
+| `host_user_added_sitemap_add` | POST | Добавление Sitemap |
+| `host_user_added_sitemap_info` | GET | Информация о пользовательском Sitemap |
+| `host_user_added_sitemap_delete` | DELETE | Удаление Sitemap |
+
+#### Search Queries
+| Resource | Method | Description |
+|----------|--------|-------------|
+| `host_search_queries_popular` | GET | Популярные поисковые запросы |
+| `host_search_queries_history_all` | GET | Статистика по всем запросам |
+| `host_search_queries_history` | GET | Статистика по запросу |
+| `host_query_analytics` | GET | Мониторинг запросов |
+
+#### Recrawl
+| Resource | Method | Description |
+|----------|--------|-------------|
+| `host_recrawl_queue` | GET | Список задач на переобход |
+| `host_recrawl_add` | POST | Отправка на переобход |
+| `host_recrawl_quota` | GET | Проверка квоты |
+| `host_recrawl_task` | GET | Статус задачи |
+
+#### Diagnostics & Indexing
+| Resource | Method | Description |
+|----------|--------|-------------|
+| `host_diagnostics` | GET | Диагностика сайта |
+| `host_indexing_history` | GET | История индексирования |
+| `host_indexing_samples` | GET | Примеры загруженных страниц |
+| `host_insearch_history` | GET | История страниц в поиске |
+| `host_insearch_samples` | GET | Примеры страниц в поиске |
+| `host_search_events_history` | GET | История появления/исключения страниц |
+| `host_search_events_samples` | GET | Примеры появившихся/удаленных страниц |
+
+#### Links
+| Resource | Method | Description |
+|----------|--------|-------------|
+| `host_links_internal_samples` | GET | Неработающие внутренние ссылки |
+| `host_links_internal_history` | GET | История внутренних ссылок |
+| `host_links_external_samples` | GET | Внешние ссылки на сайт |
+| `host_links_external_history` | GET | История внешних ссылок |
+
+#### Feeds
+| Resource | Method | Description |
+|----------|--------|-------------|
+| `host_feeds_list` | GET | Список загруженных фидов |
+| `host_feed_add_start` | POST | Асинхронная загрузка фида |
+| `host_feed_add_info` | GET | Статус загрузки фида |
+| `host_feeds_batch_add` | POST | Загрузка нескольких фидов |
+| `host_feeds_batch_remove` | POST | Удаление нескольких фидов |
+
+---
+
 ## Setup
 
 ### 1. Get OAuth Token
@@ -182,6 +265,9 @@ export YANDEX_METRIKA_TOKEN="your-oauth-token"
 # For Direct
 export YANDEX_DIRECT_TOKEN="your-oauth-token"
 export YANDEX_DIRECT_CLIENT_LOGIN="your-login"  # Optional
+
+# For Webmaster
+export YANDEX_WEBMASTER_TOKEN="your-oauth-token"
 ```
 
 ### 3. Use the Configuration
@@ -194,6 +280,9 @@ client = ApiForgeClient(config_path="apiforge-configs/yandex/metrika.json")
 
 # Direct
 client = ApiForgeClient(config_path="apiforge-configs/yandex/direct.json")
+
+# Webmaster
+client = ApiForgeClient(config_path="apiforge-configs/yandex/webmaster.json")
 ```
 
 ## Examples
@@ -204,3 +293,4 @@ See [examples/](../../examples/) directory for complete usage examples.
 
 - [Yandex Metrika API](https://yandex.ru/dev/metrika/)
 - [Yandex Direct API](https://yandex.ru/dev/direct/doc/ru/concepts/overview)
+- [Yandex Webmaster API](https://yandex.ru/dev/webmaster/doc/ru/concepts/getting-started)
