@@ -1,82 +1,169 @@
-# Yandex Direct API Configuration
+# Yandex API Configurations
 
-Configuration files for Yandex Direct API.
+Configuration files for Yandex APIs.
 
 ## Available Configurations
 
+### metrika.json
+
+Complete configuration for Yandex Metrika API.
+
+#### API Management (`/management/v1/`)
+
+| Resource | Method | Description |
+|----------|--------|-------------|
+| `counters` | GET | Список доступных счетчиков |
+| `counter` | GET | Информация о счетчике |
+| `counter_create` | POST | Создание счетчика |
+| `counter_update` | PUT | Изменение счетчика |
+| `counter_delete` | DELETE | Удаление счетчика |
+| `counter_undelete` | POST | Восстановление счетчика |
+| `goals` | GET | Список целей |
+| `goal` | GET | Информация о цели |
+| `goal_create` | POST | Создание цели |
+| `goal_update` | PUT | Изменение цели |
+| `goal_delete` | DELETE | Удаление цели |
+| `filters` | GET | Список фильтров |
+| `filter_create` | POST | Создание фильтра |
+| `filter_delete` | DELETE | Удаление фильтра |
+| `operations` | GET | Список операций |
+| `grants` | GET | Список грантов |
+| `grant_create` | POST | Создание гранта |
+| `grant_delete` | DELETE | Удаление гранта |
+| `segments` | GET | Список сегментов |
+| `segment_create` | POST | Создание сегмента |
+| `segment_delete` | DELETE | Удаление сегмента |
+| `labels` | GET | Список меток |
+| `label_create` | POST | Создание метки |
+| `label_update` | PUT | Изменение метки |
+| `label_delete` | DELETE | Удаление метки |
+| `label_bind_counters` | POST | Привязка счетчиков к метке |
+| `label_unbind_counters` | POST | Отвязка счетчиков от метки |
+| `accounts` | GET | Список аккаунтов |
+| `representatives` | GET | Список представителей |
+| `representative_create` | POST | Создание представителя |
+| `representative_delete` | DELETE | Удаление представителя |
+| `direct_clients` | GET | Список клиентов Директа |
+| `direct_clients_bind` | POST | Привязка клиентов Директа |
+| `direct_clients_unbind` | DELETE | Отвязка клиентов Директа |
+| `exports` | GET | Список экспортов |
+| `export_create` | POST | Создание экспорта |
+| `export_delete` | DELETE | Удаление экспорта |
+
+#### API Statistics (`/stat/v1/`)
+
+| Resource | Method | Description |
+|----------|--------|-------------|
+| `stat_data` | GET | Получение данных (таблица) |
+| `stat_data_drilldown` | GET | Древовидный отчет |
+| `stat_data_bytime` | GET | Данные по времени |
+| `stat_data_comparison` | GET | Сравнение сегментов |
+
+#### API Logs (`/management/v1/counter/{id}/logrequests`)
+
+| Resource | Method | Description |
+|----------|--------|-------------|
+| `logrequests` | GET | Список запросов |
+| `logrequest` | GET | Информация о запросе |
+| `logrequest_create` | POST | Создание запроса |
+| `logrequest_cancel` | POST | Отмена запроса |
+| `logrequest_reset` | POST | Сброс запроса |
+| `logrequest_clean` | POST | Очистка запроса |
+| `logrequest_download` | GET | Скачивание данных |
+
+#### Reference Data
+
+| Resource | Method | Description |
+|----------|--------|-------------|
+| `messengers` | GET | Список мессенджеров |
+| `social_networks` | GET | Список социальных сетей |
+| `currencies` | GET | Список валют |
+| `timezones` | GET | Список часовых поясов |
+
+#### Goal Types
+
+- `url` — Посещение страниц
+- `action` — JavaScript-событие
+- `step` — Составная цель
+- `number` — Количество просмотров
+- `visit_duration` — Продолжительность визита
+- `file` — Скачивание файлов
+- `phone` — Клик по номеру телефона
+- `email` — Клик по email
+- `messenger` — Переход в мессенджер
+- `social` — Переход в социальную сеть
+- `chat` — Клик по чату
+- `payment_system` — Платежная система
+
+---
+
 ### direct.json
 
-Complete configuration for Yandex Direct API with all available services:
+Complete configuration for Yandex Direct API with 30+ services.
 
-## Services
+#### Reports
+- **reports** — Получение статистики по аккаунту Директа
 
-### Reports
-- **reports** - Получение статистики по аккаунту Директа
+#### Campaigns
+- **campaigns** — Управление кампаниями
 
-### Campaigns
-- **campaigns** - Управление кампаниями (add, delete, get, update, archive, unarchive, resume, suspend)
+#### Ad Groups
+- **adgroups** — Управление группами объявлений
 
-### Ad Groups
-- **adgroups** - Управление группами объявлений (add, delete, get, update)
+#### Ads
+- **ads** — Управление объявлениями
 
-### Ads
-- **ads** - Управление объявлениями (add, delete, get, update, archive, unarchive, resume, suspend, moderate)
+#### Keywords
+- **keywords** — Управление ключевыми фразами
 
-### Keywords
-- **keywords** - Управление ключевыми фразами и автотаргетингами (add, delete, get, update, resume, suspend)
+#### Bids
+- **bids** — Управление ставками
+- **keywordbids** — Ставки по ключевым фразам
+- **bidmodifiers** — Корректировки ставок
 
-### Bids
-- **bids** - Управление ставками (get, set, setAuto)
-- **keywordbids** - Управление ставками по ключевым фразам (get, set, setAuto)
-- **bidmodifiers** - Управление корректировками ставок (add, delete, get, set)
+#### Negative Keywords
+- **negativekeywordsharedsets** — Наборы минус-фраз
 
-### Negative Keywords
-- **negativekeywordsharedsets** - Управление наборами минус-фраз (add, delete, get, update)
+#### Media
+- **adimages** — Изображения
+- **creatives** — Креативы
+- **advideos** — Видео
 
-### Keywords Research
-- **keywordsresearch** - Предобработка ключевых фраз (deduplicate, hasSearchVolume)
+#### Turbo Pages
+- **turbopages** — Турбо-страницы
+- **leads** — Данные из форм
 
-### Businesses
-- **businesses** - Получение профилей организаций (get)
+#### Extensions
+- **sitelinks** — Быстрые ссылки
+- **adextensions** — Расширения
 
-### Media
-- **adimages** - Операции с изображениями (add, delete, get)
-- **creatives** - Получение креативов (add, get)
-- **advideos** - Операции с видео (add, get)
+#### Audience
+- **audiencetargets** — Нацеливание на аудиторию
+- **retargetinglists** — Ретаргетинг
 
-### Turbo Pages
-- **turbopages** - Получение параметров Турбо-страниц (get)
-- **leads** - Получение данных из форм на Турбо-страницах (get)
+#### Clients
+- **clients** — Рекламодатели
+- **agencyclients** — Клиенты агентства
 
-### Extensions
-- **sitelinks** - Операции с быстрыми ссылками (add, delete, get)
-- **adextensions** - Операции с расширениями объявлений (add, delete, get)
+#### Feeds
+- **feeds** — Фиды
 
-### Audience
-- **audiencetargets** - Управление условиями нацеливания на аудиторию (add, delete, get, resume, setBids, suspend)
-- **retargetinglists** - Управление условиями ретаргетинга и подбора аудитории (add, delete, get, update)
+#### Dictionaries
+- **dictionaries** — Справочники
 
-### Clients
-- **clients** - Управление параметрами рекламодателя (get, update)
-- **agencyclients** - Управление клиентами агентства (add, get, update)
+#### Changes
+- **changes** — Проверка изменений
 
-### Feeds
-- **feeds** - Операции с фидами (add, delete, get, update)
+#### Strategies
+- **strategies** — Стратегии
 
-### Dictionaries
-- **dictionaries** - Получение справочных данных (get)
+#### Account
+- **accountlogins** — Логины
+- **balance** — Баланс
+- **units** — Баллы
+- **grants** — Гранты
 
-### Changes
-- **changes** - Проверка наличия изменений (check, checkCampaigns, checkDictionaries)
-
-### Strategies
-- **strategies** - Операции с пакетными стратегиями (get, set)
-
-### Account
-- **accountlogins** - Получение списка логинов (get)
-- **balance** - Получение информации о балансе (get)
-- **units** - Получение информации об использовании баллов (get)
-- **grants** - Получение списка грантов (get)
+---
 
 ## Setup
 
@@ -89,13 +176,12 @@ Complete configuration for Yandex Direct API with all available services:
 ### 2. Set Environment Variables
 
 ```bash
-# Linux/macOS
+# For Metrika
+export YANDEX_METRIKA_TOKEN="your-oauth-token"
+
+# For Direct
 export YANDEX_DIRECT_TOKEN="your-oauth-token"
 export YANDEX_DIRECT_CLIENT_LOGIN="your-login"  # Optional
-
-# Windows
-set YANDEX_DIRECT_TOKEN=your-oauth-token
-set YANDEX_DIRECT_CLIENT_LOGIN=your-login
 ```
 
 ### 3. Use the Configuration
@@ -103,55 +189,18 @@ set YANDEX_DIRECT_CLIENT_LOGIN=your-login
 ```python
 from apiforge import ApiForgeClient
 
-client = ApiForgeClient(
-    config_path="apiforge-configs/yandex/direct.json"
-)
+# Metrika
+client = ApiForgeClient(config_path="apiforge-configs/yandex/metrika.json")
 
-# Get campaigns
-response = client.request("campaigns", data={
-    "params": {
-        "fieldNames": ["Id", "Name", "Status"]
-    }
-})
-
-# Get report
-response = client.request("reports", data={
-    "params": {
-        "SelectionCriteria": {},
-        "FieldNames": ["Date", "Impressions", "Clicks"],
-        "ReportName": "my_report",
-        "ReportType": "ACCOUNT_PERFORMANCE_REPORT",
-        "DateRangeType": "LAST_7_DAYS",
-        "Format": "TSV",
-        "IncludeVAT": "YES"
-    }
-})
-```
-
-## Sandbox
-
-For testing, use the sandbox environment:
-
-```python
-from apiforge import ApiForgeClient
-
-client = ApiForgeClient(
-    config_path="apiforge-configs/yandex/direct.json"
-)
-
-# Override base URL for sandbox
-client._base_url = "https://api-sandbox.direct.yandex.com/json/v5"
-client._adapter.base_url = client._base_url
+# Direct
+client = ApiForgeClient(config_path="apiforge-configs/yandex/direct.json")
 ```
 
 ## Examples
 
-See [examples/yandex_direct_reports.py](../../examples/yandex_direct_reports.py) for complete usage examples.
+See [examples/](../../examples/) directory for complete usage examples.
 
 ## Documentation
 
-- [Yandex Direct API Documentation](https://yandex.ru/dev/direct/doc/ru/concepts/overview)
-- [API Reference](https://yandex.ru/dev/direct/doc/ru/concepts/about)
-- [Reports Service](https://yandex.ru/dev/direct/doc/ru/reports)
-- [HTTP Headers](https://yandex.ru/dev/direct/doc/ru/headers)
-- [Sandbox](https://yandex.ru/dev/direct/doc/ru/concepts/sandbox)
+- [Yandex Metrika API](https://yandex.ru/dev/metrika/)
+- [Yandex Direct API](https://yandex.ru/dev/direct/doc/ru/concepts/overview)
