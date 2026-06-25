@@ -172,7 +172,7 @@ apiforge doctor --provider yandex --api metrika
 # Output: Configuration validation failed: [resources.users] 'path' is a required property
 ```
 
-**Solution**: Check config structure against schema. See `examples/configs/_template/api_template.json`.
+**Solution**: Check config structure against schema. See `configs/_template/api_template.json`.
 
 #### "Missing required parameters"
 

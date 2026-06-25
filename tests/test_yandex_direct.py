@@ -12,7 +12,7 @@ from apiforge.config import load_config
 @pytest.fixture
 def direct_config_path():
     """Path to Yandex Direct config file."""
-    return Path(__file__).parent.parent / "examples/configs" / "yandex" / "direct.json"
+    return Path(__file__).parent.parent / "configs" / "yandex" / "direct.json"
 
 
 @pytest.fixture

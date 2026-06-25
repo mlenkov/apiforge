@@ -11,7 +11,7 @@ from apiforge.config import load_config
 @pytest.fixture
 def webmaster_config_path():
     """Path to Yandex Webmaster config file."""
-    return Path(__file__).parent.parent / "examples/configs" / "yandex" / "webmaster.json"
+    return Path(__file__).parent.parent / "configs" / "yandex" / "webmaster.json"
 
 
 @pytest.fixture

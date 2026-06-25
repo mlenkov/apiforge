@@ -18,7 +18,6 @@ def _get_schema() -> dict[str, Any]:
     if not schema_path.exists():
         schema_path = (
             Path(__file__).parent.parent.parent
-            / "examples"
             / "configs"
             / "_template"
             / "api_template.json"

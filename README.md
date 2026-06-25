@@ -239,7 +239,7 @@ apiforge/
 
 See the [examples](examples/) directory:
 - [Yandex Metrika](examples/yandex_metrika.py) — Working with Yandex Metrika API
-- [Bundled configs](examples/configs/) — Pre-built configs for Yandex APIs
+- [Bundled configs](configs/) — Pre-built configs for Yandex APIs
 
 ## Development
 
@@ -286,12 +286,26 @@ See [docs/architecture.md](docs/architecture.md) for detailed architecture docum
 ## Documentation
 
 - [Architecture](docs/architecture.md) — System design and patterns
+- [Config Creation](docs/config-creation.md) — How to create configs (human guide)
+- [Config Generation](docs/config-generation.md) — How to generate configs (AI guide)
 - [ADR-001](docs/adr/001-config-driven-architecture.md) — Config-driven design
 - [ADR-007](docs/adr/007-mcp-integration.md) — MCP server integration
 - [ADR-008](docs/adr/008-access-control.md) — Access control architecture
 - [Runbook](docs/runbook.md) — Operations and troubleshooting
 - [Configuration](docs/configuration.md) — Config reference
 - [FAQ](docs/faq.md) — Common questions
+
+## Bundled Configs
+
+Pre-built configs for Yandex APIs are in [`configs/`](configs/):
+
+| API | Config | Resources |
+|-----|--------|-----------|
+| Metrika | `configs/yandex/metrika.json` | 52 |
+| Direct | `configs/yandex/direct.json` | 30 |
+| Audience | `configs/yandex/audience.json` | 54 |
+| AdMetrica | `configs/yandex/admetrica.json` | 29 |
+| Webmaster | `configs/yandex/webmaster.json` | 42 |
 
 ## Roadmap
 

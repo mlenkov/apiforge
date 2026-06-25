@@ -11,7 +11,7 @@ from apiforge.config import load_config
 @pytest.fixture
 def admetrica_config_path():
     """Path to Yandex AdMetrica config file."""
-    return Path(__file__).parent.parent / "examples/configs" / "yandex" / "admetrica.json"
+    return Path(__file__).parent.parent / "configs" / "yandex" / "admetrica.json"
 
 
 @pytest.fixture
