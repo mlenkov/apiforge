@@ -9,15 +9,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Architecture documentation (`docs/architecture.md`)
-- Architecture Decision Records (`docs/adr/`)
-- Contributing guidelines (`CONTRIBUTING.md`)
-- This changelog
+- ADR-007: MCP Server Integration (`docs/adr/007-mcp-integration.md`)
+- ADR-008: Access Control Architecture (`docs/adr/008-access-control.md`)
+- `on_before_request` hook in BaseAdapter for MCP policy enforcement
+- Resource method validation (must be GET/POST/PUT/DELETE/PATCH)
+- Response encoding fallback (UTF-8 → latin-1)
+- Retry-After header parsing with error handling
+- Backward-compatibility shims for old import paths
 
 ### Changed
 
-- Enhanced README with comprehensive documentation
-- Improved error messages with suggestions
+- **BREAKING**: Renamed `ApiForgeClient` → `Client` (old name still works as alias)
+- **BREAKING**: Renamed `ApiForgeResponse` → `Response` (old name still works as alias)
+- **BREAKING**: Renamed `ApiForgeExecutor` → `Executor` (old name still works as alias)
+- **BREAKING**: Renamed `HTTPAdapter` → `RequestsAdapter` (old name still works as alias)
+- Moved `core/` modules to package root (`apiforge/client.py`, etc.)
+- Split `config.py` into `config/` package (loader, validator, discovery)
+- Moved `apiforge-configs/` → `examples/configs/`
+- Updated architecture documentation for MCP integration
+- Updated CONTRIBUTING.md with new code structure
+- Updated SECURITY.md with MCP security considerations
+
+### Fixed
+
+- Resource mutation in convenience methods (get/post/put/delete/patch)
+- Dead `url` variable in `client.request()`
+- Response decode fallback (was UnicodeDecodeError, now falls back to latin-1)
+- Duplicate TestGetConfigPath/TestListConfigs classes in test_config.py
+- Retry-After header parsing crash on non-numeric values
+
+### Removed
+
+- Unused executor parameters (base_url, auth, etc.) — executor uses adapter
+- Duplicate except blocks in RequestsAdapter (was 4 redundant re-raises)
 
 ## [0.1.0] - 2024-01-01
 

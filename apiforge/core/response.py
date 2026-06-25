@@ -1,54 +1,5 @@
-"""Response module for ApiForge."""
+"""Backward-compat shim — use apiforge.response.Response instead."""
 
-from __future__ import annotations
+from ...response import Response as ApiForgeResponse
 
-import json
-from typing import Any, Optional
-
-
-class ApiForgeResponse:
-    """Wrapper for API responses."""
-
-    def __init__(
-        self,
-        status_code: int,
-        content: bytes,
-        headers: dict[str, str],
-        data: Optional[Any] = None,
-    ) -> None:
-        self.status_code = status_code
-        self.content = content
-        self.headers = headers
-        self._data = data
-
-    @property
-    def data(self) -> Any:
-        """Parse and return response data."""
-        if self._data is not None:
-            return self._data
-
-        if not self.content:
-            return None
-
-        content_type = self.headers.get("content-type", "")
-        if "json" in content_type:
-            return json.loads(self.content)
-        return self.content.decode("utf-8")
-
-    @property
-    def ok(self) -> bool:
-        """Check if response status is 2xx."""
-        return 200 <= self.status_code < 300
-
-    def json(self) -> Any:
-        """Parse response as JSON."""
-        if not self.content:
-            return None
-        return json.loads(self.content)
-
-    def text(self) -> str:
-        """Return response as text."""
-        return self.content.decode("utf-8")
-
-    def __repr__(self) -> str:
-        return f"ApiForgeResponse(status_code={self.status_code})"
+__all__ = ["ApiForgeResponse"]

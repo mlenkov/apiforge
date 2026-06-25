@@ -13,19 +13,14 @@ Modern Python API Client Generator from JSON Configs.
 - **Automatic parameter validation** — Required parameters enforced at runtime
 - **Built-in retry logic** — Automatic retries with exponential backoff
 - **Type-safe responses** — Structured response objects with lazy parsing
-- **Extensible architecture** — Custom adapters and serializers
+- **Extensible architecture** — Custom adapters for any HTTP library
+- **MCP-ready** — `on_before_request` hook for access control and token management
 - **CLI tools** — Validate and manage configurations
 
 ## Installation
 
 ```bash
 pip install apiforge
-```
-
-For async support:
-
-```bash
-pip install apiforge[async]
 ```
 
 For development:
@@ -37,8 +32,6 @@ pip install apiforge[dev]
 ## Quick Start
 
 ### 1. Create a Configuration
-
-Create a JSON config file for your API:
 
 ```json
 {
@@ -78,10 +71,10 @@ Create a JSON config file for your API:
 ### 2. Use the Client
 
 ```python
-from apiforge import ApiForgeClient
+from apiforge import Client
 
 # Create client from config file
-client = ApiForgeClient(config_path="path/to/config.json")
+client = Client(config_path="path/to/config.json")
 
 # List available resources
 print(client.list_resources())  # ['users', 'user']
@@ -101,11 +94,31 @@ response = client.get("users", params={"limit": 5})
 ### 3. Context Manager
 
 ```python
-with ApiForgeClient(config_path="config.json") as client:
+with Client(config_path="config.json") as client:
     response = client.request("users")
     print(response.json())
 # Session automatically closed
 ```
+
+## MCP Integration
+
+ApiForge is designed as a transport core for MCP servers. Use the `on_before_request` hook for access control, token management, and audit logging:
+
+```python
+from apiforge import Client
+
+def enforce_policy(method: str, url: str):
+    """MCP policy: only allow GET requests."""
+    if method != "GET":
+        raise PermissionError("Read-only mode")
+
+client = Client(
+    config_path="config.json",
+    on_before_request=enforce_policy
+)
+```
+
+See [docs/adr/007-mcp-integration.md](docs/adr/007-mcp-integration.md) for architecture details.
 
 ## Configuration Reference
 
@@ -117,19 +130,6 @@ with ApiForgeClient(config_path="config.json") as client:
 | `auth` | object | No | Authentication credentials |
 | `default_headers` | object | No | Headers added to all requests |
 | `resources` | object | Yes | API endpoint definitions |
-
-### Authentication
-
-```json
-{
-  "auth": {
-    "token": "OAuth token",
-    "api_key": "API key",
-    "username": "Basic auth username",
-    "password": "Basic auth password"
-  }
-}
-```
 
 ### Resource Definition
 
@@ -144,12 +144,8 @@ with ApiForgeClient(config_path="config.json") as client:
         "param": {
           "type": "string",
           "required": true,
-          "description": "Parameter description",
-          "default": "default_value"
+          "description": "Parameter description"
         }
-      },
-      "headers": {
-        "X-Custom-Header": "value"
       }
     }
   }
@@ -158,85 +154,25 @@ with ApiForgeClient(config_path="config.json") as client:
 
 ### Supported HTTP Methods
 
-- `GET` (default)
-- `POST`
-- `PUT`
-- `DELETE`
-- `PATCH`
-
-### Parameter Types
-
-- `string`
-- `integer`
-- `number`
-- `boolean`
+`GET`, `POST`, `PUT`, `DELETE`, `PATCH`
 
 ## CLI Usage
 
-### Validate Configurations
-
 ```bash
-# Check all installed configs
+# Validate all installed configs
 apiforge doctor
 
 # Check specific provider
 apiforge doctor --provider yandex
 
-# Check specific API
-apiforge doctor --provider yandex --api metrika
-```
-
-### Install Default Configurations
-
-```bash
+# Install default configs
 apiforge install
 ```
 
-This creates the directory structure at `~/.apiforge/configs/`.
-
-## Advanced Usage
-
-### Custom Adapter
+## Error Handling
 
 ```python
-from apiforge.adapters.base import BaseAdapter
-from apiforge.core.response import ApiForgeResponse
-
-class CustomAdapter(BaseAdapter):
-    def request(self, method, url, params=None, data=None, headers=None, **kwargs):
-        # Your custom implementation
-        response = your_http_library.request(method, url, ...)
-        return ApiForgeResponse(
-            status_code=response.status_code,
-            content=response.content,
-            headers=dict(response.headers)
-        )
-
-# Use custom adapter
-from apiforge import ApiForgeClient
-client = ApiForgeClient(config_path="config.json")
-client._adapter = CustomAdapter()
-```
-
-### Custom Serializer
-
-```python
-from apiforge.serializers.base import BaseSerializer
-
-class MsgPackSerializer(BaseSerializer):
-    def dumps(self, obj):
-        import msgpack
-        return msgpack.packb(obj)
-    
-    def loads(self, data):
-        import msgpack
-        return msgpack.unpackb(data)
-```
-
-### Error Handling
-
-```python
-from apiforge import ApiForgeClient
+from apiforge import Client
 from apiforge.exceptions import (
     ApiForgeError,
     ApiForgeRequestError,
@@ -247,7 +183,7 @@ from apiforge.exceptions import (
 )
 
 try:
-    client = ApiForgeClient(config_path="config.json")
+    client = Client(config_path="config.json")
     response = client.request("users")
 except ApiForgeAuthenticationError:
     print("Authentication failed")
@@ -263,15 +199,49 @@ except ApiForgeError as e:
     print(f"ApiForge error: {e}")
 ```
 
+## Backward Compatibility
+
+Old import paths still work:
+
+```python
+# These all work (old style)
+from apiforge import ApiForgeClient
+from apiforge.core.client import ApiForgeClient
+from apiforge.adapters.http import HTTPAdapter
+
+# Recommended (new style)
+from apiforge import Client
+from apiforge.adapters import RequestsAdapter
+```
+
+## Project Structure
+
+```
+apiforge/
+├── __init__.py              # Public API
+├── client.py                # Client (main entry point)
+├── executor.py              # Executor (coordinates adapter calls)
+├── resource.py              # Resource (endpoint definition)
+├── response.py              # Response (HTTP response wrapper)
+├── exceptions.py            # Exception hierarchy
+├── cli.py                   # CLI tools
+├── config/                  # Configuration package
+│   ├── loader.py            # load_config()
+│   ├── validator.py         # JSON Schema validation
+│   └── discovery.py         # get_config_path(), list_configs()
+├── adapters/                # Transport layer
+│   ├── base.py              # BaseAdapter (ABC)
+│   └── requests_adapter.py  # RequestsAdapter (requests library)
+└── core/                    # Backward-compat shims
+```
+
 ## Examples
 
-See the [examples](examples/) directory for complete usage examples:
-
+See the [examples](examples/) directory:
 - [Yandex Metrika](examples/yandex_metrika.py) — Working with Yandex Metrika API
+- [Bundled configs](examples/configs/) — Pre-built configs for Yandex APIs
 
 ## Development
-
-### Setup
 
 ```bash
 # Clone the repository
@@ -280,48 +250,48 @@ cd apiforge
 
 # Create virtual environment
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate
 
 # Install in development mode
 pip install -e ".[dev]"
-```
 
-### Running Tests
-
-```bash
+# Run tests
 pytest tests/ -v
-```
 
-### Code Quality
-
-```bash
-# Linting
+# Code quality
 ruff check .
-
-# Formatting
-black .
-
-# Type checking
+black --check .
 mypy .
 ```
 
 ## Architecture
 
-ApiForge follows a layered architecture:
-
 ```
-┌─────────────────────────────────────┐
-│           ApiForgeClient            │  ← User-facing API
-├─────────────────────────────────────┤
-│         ApiForgeExecutor            │  ← Coordinates requests
-├─────────────────────────────────────┤
-│           HTTPAdapter               │  ← Transport layer
-├─────────────────────────────────────┤
-│          requests library           │  ← HTTP implementation
-└─────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                        Client                               │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
+│  │   Config    │  │  Resources  │  │      Executor       │ │
+│  └─────────────┘  └─────────────┘  └─────────────────────┘ │
+├─────────────────────────────────────────────────────────────┤
+│                    Adapter Layer                            │
+│  ┌─────────────┐  ┌─────────────────┐  ┌─────────────────┐ │
+│  │ BaseAdapter │  │ RequestsAdapter │  │  on_before_     │ │
+│  │   (ABC)     │  │   (requests)    │  │  request hook   │ │
+│  └─────────────┘  └─────────────────┘  └─────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 See [docs/architecture.md](docs/architecture.md) for detailed architecture documentation.
+
+## Documentation
+
+- [Architecture](docs/architecture.md) — System design and patterns
+- [ADR-001](docs/adr/001-config-driven-architecture.md) — Config-driven design
+- [ADR-007](docs/adr/007-mcp-integration.md) — MCP server integration
+- [ADR-008](docs/adr/008-access-control.md) — Access control architecture
+- [Runbook](docs/runbook.md) — Operations and troubleshooting
+- [Configuration](docs/configuration.md) — Config reference
+- [FAQ](docs/faq.md) — Common questions
 
 ## Roadmap
 
@@ -330,6 +300,7 @@ See [docs/architecture.md](docs/architecture.md) for detailed architecture docum
 - [x] Retry logic with backoff
 - [x] CLI tools
 - [x] CI/CD pipeline
+- [x] MCP integration hook
 - [ ] Async support (httpx)
 - [ ] Pagination helpers
 - [ ] Rate limiting
@@ -348,3 +319,4 @@ MIT License. See [LICENSE](LICENSE) for details.
 
 - [GitHub Issues](https://github.com/apiforge/apiforge/issues)
 - [Documentation](https://github.com/apiforge/apiforge#readme)
+- [Security Policy](SECURITY.md)

@@ -15,10 +15,10 @@ This document provides comprehensive examples of using ApiForge.
 ### Simple Client
 
 ```python
-from apiforge import ApiForgeClient
+from apiforge import Client
 
 # Create client from config file
-client = ApiForgeClient(config_path="config.json")
+client = Client(config_path="config.json")
 
 # Make a request
 response = client.request("users")
@@ -28,9 +28,9 @@ print(response.json())
 ### Context Manager
 
 ```python
-from apiforge import ApiForgeClient
+from apiforge import Client
 
-with ApiForgeClient(config_path="config.json") as client:
+with Client(config_path="config.json") as client:
     response = client.request("users")
     print(response.json())
 # Session automatically closed
@@ -39,9 +39,9 @@ with ApiForgeClient(config_path="config.json") as client:
 ### Using Convenience Methods
 
 ```python
-from apiforge import ApiForgeClient
+from apiforge import Client
 
-client = ApiForgeClient(config_path="config.json")
+client = Client(config_path="config.json")
 
 # GET request
 response = client.get("users", params={"limit": 10})
@@ -200,11 +200,11 @@ response = client.patch("users", data={"name": "Jane"})
 ### Basic Error Handling
 
 ```python
-from apiforge import ApiForgeClient
+from apiforge import Client
 from apiforge.exceptions import ApiForgeError
 
 try:
-    client = ApiForgeClient(config_path="config.json")
+    client = Client(config_path="config.json")
     response = client.request("users")
     print(response.json())
 except ApiForgeError as e:
@@ -214,7 +214,7 @@ except ApiForgeError as e:
 ### Specific Error Handling
 
 ```python
-from apiforge import ApiForgeClient
+from apiforge import Client
 from apiforge.exceptions import (
     ApiForgeAuthenticationError,
     ApiForgeRateLimitError,
@@ -223,7 +223,7 @@ from apiforge.exceptions import (
 )
 
 try:
-    client = ApiForgeClient(config_path="config.json")
+    client = Client(config_path="config.json")
     response = client.request("users")
 except ApiForgeAuthenticationError:
     print("Authentication failed. Check your API credentials.")
@@ -239,10 +239,10 @@ except ApiForgeConfigError as e:
 
 ```python
 import time
-from apiforge import ApiForgeClient
+from apiforge import Client
 from apiforge.exceptions import ApiForgeRateLimitError
 
-client = ApiForgeClient(
+client = Client(
     config_path="config.json",
     max_retries=5,
     retry_delay=2.0
@@ -261,9 +261,9 @@ except ApiForgeRateLimitError as e:
 
 ```python
 from apiforge.adapters.base import BaseAdapter
-from apiforge.core.response import ApiForgeResponse
+from apiforge.response import Response
 
-class CustomHTTPAdapter(BaseAdapter):
+class CustomRequestsAdapter(BaseAdapter):
     def __init__(self, base_url="", auth=None, timeout=30.0):
         self.base_url = base_url
         self.auth = auth
@@ -284,18 +284,18 @@ class CustomHTTPAdapter(BaseAdapter):
             timeout=self.timeout
         )
         
-        # Return ApiForgeResponse
-        return ApiForgeResponse(
+        # Return Response
+        return Response(
             status_code=response.status_code,
             content=response.content,
             headers=dict(response.headers)
         )
 
 # Use custom adapter
-from apiforge import ApiForgeClient
+from apiforge import Client
 
-client = ApiForgeClient(config_path="config.json")
-client._adapter = CustomHTTPAdapter(
+client = Client(config_path="config.json")
+client._adapter = CustomRequestsAdapter(
     base_url="https://api.example.com",
     auth={"token": "your-token"}
 )
@@ -316,9 +316,9 @@ class MsgPackSerializer(BaseSerializer):
         return msgpack.unpackb(data)
 
 # Use custom serializer
-from apiforge.adapters.http import HTTPAdapter
+from apiforge.adapters.requests_adapter import RequestsAdapter
 
-adapter = HTTPAdapter(
+adapter = RequestsAdapter(
     base_url="https://api.example.com",
     serializer=MsgPackSerializer()
 )
@@ -328,7 +328,7 @@ adapter = HTTPAdapter(
 
 ```python
 import os
-from apiforge import ApiForgeClient
+from apiforge import Client
 
 # Build config dynamically
 config = {
@@ -344,16 +344,16 @@ config = {
     }
 }
 
-client = ApiForgeClient(config=config)
+client = Client(config=config)
 response = client.request("users")
 ```
 
 ### Pagination
 
 ```python
-from apiforge import ApiForgeClient
+from apiforge import Client
 
-client = ApiForgeClient(config_path="config.json")
+client = Client(config_path="config.json")
 
 # Simple pagination
 page = 1
@@ -377,13 +377,13 @@ while True:
 
 ```python
 import asyncio
-from apiforge import ApiForgeClient
+from apiforge import Client
 
 async def fetch_user(client, user_id):
     return client.request("user", params={"user_id": user_id})
 
 async def main():
-    client = ApiForgeClient(config_path="config.json")
+    client = Client(config_path="config.json")
     
     # Fetch multiple users concurrently
     tasks = [fetch_user(client, i) for i in range(1, 11)]
@@ -401,13 +401,13 @@ asyncio.run(main())
 
 ```python
 from fastapi import FastAPI, HTTPException
-from apiforge import ApiForgeClient
+from apiforge import Client
 from apiforge.exceptions import ApiForgeError
 
 app = FastAPI()
 
 # Initialize client
-client = ApiForgeClient(config_path="config.json")
+client = Client(config_path="config.json")
 
 @app.get("/users")
 async def get_users():
@@ -422,11 +422,11 @@ async def get_users():
 
 ```python
 from django.http import JsonResponse
-from apiforge import ApiForgeClient
+from apiforge import Client
 from apiforge.exceptions import ApiForgeError
 
 # Initialize client
-client = ApiForgeClient(config_path="config.json")
+client = Client(config_path="config.json")
 
 def get_users(request):
     try:
@@ -440,7 +440,7 @@ def get_users(request):
 
 ```python
 import argparse
-from apiforge import ApiForgeClient
+from apiforge import Client
 from apiforge.exceptions import ApiForgeError
 
 def main():
@@ -452,7 +452,7 @@ def main():
     args = parser.parse_args()
     
     try:
-        client = ApiForgeClient(config_path=args.config)
+        client = Client(config_path=args.config)
         
         params = {}
         if args.params:
@@ -474,20 +474,20 @@ if __name__ == "__main__":
 ```python
 import pytest
 from unittest.mock import MagicMock, patch
-from apiforge import ApiForgeClient
+from apiforge import Client
 from apiforge.exceptions import ApiForgeRequestError
 
 
 @pytest.fixture
 def mock_client():
-    with patch("apiforge.adapters.http.HTTPAdapter.request") as mock_request:
+    with patch("apiforge.adapters.http.RequestsAdapter.request") as mock_request:
         mock_request.return_value = MagicMock(
             status_code=200,
             content=b'{"users": []}',
             headers={"content-type": "application/json"}
         )
         
-        client = ApiForgeClient(config={
+        client = Client(config={
             "base_url": "https://api.example.com",
             "resources": {
                 "users": {"path": "/users", "method": "GET"}

@@ -12,7 +12,7 @@ from apiforge.config import load_config
 @pytest.fixture
 def metrika_config_path():
     """Path to Yandex Metrika config file."""
-    return Path(__file__).parent.parent / "apiforge-configs" / "yandex" / "metrika.json"
+    return Path(__file__).parent.parent / "examples/configs" / "yandex" / "metrika.json"
 
 
 @pytest.fixture

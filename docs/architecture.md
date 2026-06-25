@@ -4,7 +4,9 @@ This document describes the architecture of ApiForge, a modern Python API client
 
 ## Overview
 
-ApiForge is designed as a config-driven API client library. Instead of hand-coding API endpoints, you define them declaratively in a JSON file, and the library dynamically builds a typed client from that config.
+ApiForge is a config-driven API client library designed for transport-level abstraction. It defines API endpoints declaratively in JSON and provides a typed client with automatic validation, retry logic, and extensible adapters.
+
+**Primary use case**: Transport core for MCP (Model Context Protocol) servers.
 
 ## High-Level Architecture
 
@@ -12,27 +14,22 @@ ApiForge is designed as a config-driven API client library. Instead of hand-codi
 ┌─────────────────────────────────────────────────────────────┐
 │                        User Code                            │
 ├─────────────────────────────────────────────────────────────┤
-│                      ApiForgeClient                         │
+│                       Client                                │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
 │  │   Config    │  │  Resources  │  │      Executor       │ │
 │  │   Loader    │  │   Manager   │  │    (Coordinator)    │ │
 │  └─────────────┘  └─────────────┘  └─────────────────────┘ │
 ├─────────────────────────────────────────────────────────────┤
 │                    Adapter Layer                            │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
-│  │ BaseAdapter │  │ HTTPAdapter │  │   Custom Adapters   │ │
-│  │   (ABC)     │  │ (requests)  │  │    (httpx, etc)     │ │
-│  └─────────────┘  └─────────────┘  └─────────────────────┘ │
-├─────────────────────────────────────────────────────────────┤
-│                   Serialization Layer                       │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
-│  │BaseSerializer│ │JSONSerializer│ │  Custom Serializers  │ │
-│  │    (ABC)    │  │   (json)    │  │   (msgpack, etc)    │ │
-│  └─────────────┘  └─────────────┘  └─────────────────────┘ │
+│  ┌─────────────┐  ┌─────────────────┐  ┌─────────────────┐ │
+│  │ BaseAdapter │  │ RequestsAdapter │  │  Custom Adapters │ │
+│  │   (ABC)     │  │   (requests)    │  │   (httpx, etc)  │ │
+│  │ + hook      │  │                 │  │                 │ │
+│  └─────────────┘  └─────────────────┘  └─────────────────┘ │
 ├─────────────────────────────────────────────────────────────┤
 │                    Response Layer                           │
 │  ┌─────────────────────────────────────────────────────────┐│
-│  │                   ApiForgeResponse                      ││
+│  │                      Response                           ││
 │  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐  ││
 │  │  │  json() │  │  text() │  │   data  │  │   ok    │  ││
 │  │  └─────────┘  └─────────┘  └─────────┘  └─────────┘  ││
@@ -40,173 +37,144 @@ ApiForge is designed as a config-driven API client library. Instead of hand-codi
 └─────────────────────────────────────────────────────────────┘
 ```
 
+## Package Structure
+
+```
+apiforge/
+├── __init__.py              # Public API with backward-compat aliases
+├── client.py                # Client (main entry point)
+├── executor.py              # Executor (coordinates adapter calls)
+├── resource.py              # Resource (endpoint definition)
+├── response.py              # Response (HTTP response wrapper)
+├── exceptions.py            # Exception hierarchy
+├── cli.py                   # CLI tools
+├── config/                  # Configuration package
+│   ├── __init__.py          # Re-exports
+│   ├── loader.py            # load_config()
+│   ├── validator.py         # JSON Schema validation
+│   └── discovery.py         # get_config_path(), list_configs()
+├── adapters/                # Transport layer
+│   ├── __init__.py
+│   ├── base.py              # BaseAdapter (ABC) with on_before_request
+│   └── requests_adapter.py  # RequestsAdapter (requests library)
+├── core/                    # Backward-compat shims (do not modify)
+└── serializers/             # Unused (dead code)
+```
+
 ## Core Components
 
-### ApiForgeClient
+### Client
 
-**File:** `apiforge/core/client.py`
+**File:** `apiforge/client.py`
 
-The main entry point for users. Responsibilities:
-
+Main entry point. Responsibilities:
 - Load and validate configuration
 - Manage resources (API endpoints)
 - Coordinate request execution
 - Provide convenience methods (get, post, put, delete, patch)
+- Support `on_before_request` hook for MCP integration
 
 ```python
-class ApiForgeClient:
-    def __init__(self, config_path=None, config=None, ...):
+class Client:
+    def __init__(self, config_path=None, config=None, 
+                 on_before_request=None, ...):
         # Load config
-        # Create adapter
+        # Create adapter with hook
         # Create executor
         # Load resources
     
     def request(self, resource_name, params=None, data=None, **kwargs):
         # Get resource
         # Validate params
-        # Build URL
         # Execute via executor
 ```
 
-### ApiForgeExecutor
+### Executor
 
-**File:** `apiforge/core/executor.py`
+**File:** `apiforge/executor.py`
 
-A coordinator that delegates HTTP transport to adapters. Responsibilities:
-
+Coordinates HTTP execution. Responsibilities:
 - Manage adapter lifecycle
-- Provide clean interface for client
+- Delegate to adapter for all HTTP operations
 - Handle adapter creation if not provided
 
 ```python
-class ApiForgeExecutor:
-    def __init__(self, adapter=None, ...):
-        # Store adapter or create default
-    
+class Executor:
     def execute(self, method, path, params=None, data=None, headers=None):
         # Delegate to adapter
 ```
 
-### BaseAdapter / HTTPAdapter
+### BaseAdapter / RequestsAdapter
 
-**Files:** `apiforge/adapters/base.py`, `apiforge/adapters/http.py`
+**Files:** `apiforge/adapters/base.py`, `apiforge/adapters/requests_adapter.py`
 
-The transport layer. Responsibilities:
-
+Transport layer. Responsibilities:
 - Send HTTP requests
 - Handle retries with backoff
 - Process HTTP errors (401, 404, 429, 5xx)
-- Manage connections
+- Support `on_before_request` hook
 
 ```python
 class BaseAdapter(ABC):
-    @abstractmethod
-    def request(self, method, url, params=None, data=None, headers=None):
-        pass
+    def __init__(self, on_before_request=None):
+        self._on_before_request = on_before_request
     
-    def get(self, url, params=None, headers=None):
-        return self.request("GET", url, params=params, headers=headers)
-    # ... other convenience methods
+    @abstractmethod
+    def request(self, method, url, ...):
+        pass
 
-class HTTPAdapter(BaseAdapter):
-    def request(self, method, url, params=None, data=None, headers=None):
-        # Build URL
-        # Merge headers
+class RequestsAdapter(BaseAdapter):
+    def request(self, method, url, ...):
+        if self._on_before_request:
+            self._on_before_request(method, url)
         # Execute with retries
-        # Handle errors
-        # Return ApiForgeResponse
 ```
 
 ### Resource
 
-**File:** `apiforge/core/resource.py`
+**File:** `apiforge/resource.py`
 
-Represents an API endpoint definition. Responsibilities:
-
+API endpoint definition. Responsibilities:
 - Store endpoint metadata (path, method, parameters)
 - Validate required parameters
 - Build URLs with path parameters
+- Validate HTTP method
 
 ```python
 class Resource:
-    def __init__(self, name, path, method="GET", parameters=None, ...):
-        # Store metadata
+    VALID_METHODS = frozenset({"GET", "POST", "PUT", "DELETE", "PATCH"})
     
-    def validate_params(self, params):
-        # Check required params
-        return missing_params
-    
-    def build_url(self, base_url, **kwargs):
-        # Format path with kwargs
-        # Return full URL
+    def __init__(self, name, path, method="GET", ...):
+        if method.upper() not in self.VALID_METHODS:
+            raise ValueError(f"Invalid method '{method}'")
 ```
 
-### ApiForgeResponse
+### Response
 
-**File:** `apiforge/core/response.py`
+**File:** `apiforge/response.py`
 
-Wraps HTTP responses. Responsibilities:
-
+HTTP response wrapper. Responsibilities:
 - Store response data (status, content, headers)
 - Provide lazy parsing (json, text)
-- Indicate success/failure
+- Handle encoding fallback (UTF-8 → latin-1)
 
 ```python
-class ApiForgeResponse:
-    def __init__(self, status_code, content, headers):
-        self.status_code = status_code
-        self.content = content
-        self.headers = headers
-    
-    def json(self):
-        return json.loads(self.content)
-    
+class Response:
     def text(self):
-        return self.content.decode("utf-8")
-    
-    @property
-    def ok(self):
-        return 200 <= self.status_code < 300
+        try:
+            return self.content.decode("utf-8")
+        except UnicodeDecodeError:
+            return self.content.decode("latin-1")
 ```
 
-### Config Loader
+### Config Package
 
-**File:** `apiforge/config.py`
+**Directory:** `apiforge/config/`
 
-Handles configuration loading and validation. Responsibilities:
-
-- Read JSON files
-- Validate structure against schema
-- Provide detailed error messages
-- Discover installed configs
-
-```python
-def load_config(path):
-    # Check file exists
-    # Parse JSON
-    # Validate against schema
-    # Return config dict
-
-def list_configs():
-    # Scan ~/.apiforge/configs/
-    # Return {provider: [apis]}
-```
-
-### Exceptions
-
-**File:** `apiforge/exceptions.py`
-
-Error hierarchy for structured error handling:
-
-```
-ApiForgeError (base)
-├── ApiForgeConfigError
-├── ApiForgeValidationError
-└── ApiForgeRequestError
-    ├── ApiForgeAuthenticationError
-    ├── ApiForgeRateLimitError
-    └── ApiForgeResourceNotFoundError
-```
+Configuration handling. Split into three modules:
+- `loader.py`: Read JSON files
+- `validator.py`: JSON Schema validation
+- `discovery.py`: Find installed configs
 
 ## Data Flow
 
@@ -219,11 +187,11 @@ ApiForgeError (base)
    ↓
 3. Resource validates required parameters
    ↓
-4. Resource builds URL with path parameters
+4. Client calls executor.execute(method, path, params, data, headers)
    ↓
-5. Client calls executor.execute(method, path, params, data, headers)
+5. Executor delegates to adapter.request(method, url, params, data, headers)
    ↓
-6. Executor delegates to adapter.request(method, url, params, data, headers)
+6. Adapter calls on_before_request hook (if set)
    ↓
 7. Adapter builds full URL, merges headers
    ↓
@@ -231,7 +199,7 @@ ApiForgeError (base)
    ↓
 9. Adapter handles errors (401, 404, 429, 5xx)
    ↓
-10. Adapter wraps response in ApiForgeResponse
+10. Adapter wraps response in Response
    ↓
 11. Response returned to user
 ```
@@ -252,194 +220,81 @@ ApiForgeError (base)
 6. Client creates Resource objects from config["resources"]
 ```
 
+## MCP Integration
+
+### Access Control
+
+```python
+from apiforge import Client
+
+def enforce_read_only(method: str, url: str):
+    """MCP policy: only allow GET requests."""
+    if method != "GET":
+        raise PermissionError("Read-only mode")
+
+client = Client(
+    config_path="config.json",
+    on_before_request=enforce_read_only
+)
+```
+
+### Token Management
+
+```python
+def refresh_token_before_request(method: str, url: str):
+    """MCP hook: ensure valid token."""
+    token = token_manager.get_token()
+    # Token is now valid
+
+client = Client(
+    config_path="config.json",
+    on_before_request=refresh_token_before_request
+)
+```
+
 ## Design Patterns
 
-### Facade Pattern
+- **Facade Pattern**: Client provides simple interface to complex subsystem
+- **Strategy Pattern**: Adapters allow swapping transport implementations
+- **Template Method Pattern**: Base classes define interface, subclasses implement
+- **Hook Pattern**: on_before_request for MCP policy enforcement
 
-`ApiForgeClient` provides a simple interface to the complex subsystem:
-
-```python
-# Simple interface
-client = ApiForgeClient(config_path="config.json")
-response = client.request("users")
-
-# Hides: config loading, resource management, executor, adapter, retries
-```
-
-### Strategy Pattern
-
-Adapters allow swapping transport implementations:
-
-```python
-# Use default HTTPAdapter
-client = ApiForgeClient(config_path="config.json")
-
-# Or inject custom adapter
-client._adapter = MyCustomAdapter()
-```
-
-### Template Method Pattern
-
-Base classes define the interface, subclasses provide implementation:
-
-```python
-class BaseAdapter(ABC):
-    @abstractmethod
-    def request(self, method, url, ...):  # Template
-        pass
-
-class HTTPAdapter(BaseAdapter):
-    def request(self, method, url, ...):  # Implementation
-        # requests-based implementation
-```
-
-### Builder Pattern
-
-Resources are built from configuration:
-
-```python
-Resource(
-    name="users",
-    path="/users/{user_id}",
-    method="GET",
-    parameters={"user_id": {"type": "integer", "required": True}}
-)
-```
-
-## Error Handling Strategy
+## Error Handling
 
 ### Immediate Failures
-
-- **401 Unauthorized**: Raises `ApiForgeAuthenticationError` immediately
-- **404 Not Found**: Raises `ApiForgeResourceNotFoundError` immediately
-- **4xx Client Errors**: Raises `ApiForgeRequestError` immediately
+- 401 Unauthorized → `ApiForgeAuthenticationError`
+- 404 Not Found → `ApiForgeResourceNotFoundError`
+- 4xx Client Errors → `ApiForgeRequestError`
 
 ### Retryable Failures
+- 429 Rate Limited → Retry after `Retry-After` header
+- 5xx Server Errors → Retry with linear backoff
+- Connection/Timeout errors → Retry with linear backoff
 
-- **429 Rate Limited**: Retries after `Retry-After` header or delay
-- **5xx Server Errors**: Retries with linear backoff
-- **Connection Errors**: Retries with linear backoff
-- **Timeouts**: Retries with linear backoff
-
-### Retry Configuration
-
-```python
-adapter = HTTPAdapter(
-    max_retries=3,      # Maximum retry attempts
-    retry_delay=1.0,    # Base delay in seconds
-)
-```
-
-Backoff formula: `delay * (attempt + 1)`
-
-## Extensibility Points
-
-### Custom Adapters
-
-Implement `BaseAdapter` to use different HTTP libraries:
-
-```python
-class AsyncHTTPAdapter(BaseAdapter):
-    async def request(self, method, url, ...):
-        async with httpx.AsyncClient() as client:
-            response = await client.request(method, url, ...)
-            return ApiForgeResponse(...)
-```
-
-### Custom Serializers
-
-Implement `BaseSerializer` for different data formats:
-
-```python
-class MsgPackSerializer(BaseSerializer):
-    def dumps(self, obj):
-        return msgpack.packb(obj)
-    
-    def loads(self, data):
-        return msgpack.unpackb(data)
-```
-
-### Custom Exception Handling
-
-Catch specific exceptions for granular control:
-
-```python
-try:
-    response = client.request("users")
-except ApiForgeRateLimitError as e:
-    time.sleep(e.retry_after)
-    response = client.request("users")
-```
-
-## Performance Considerations
-
-### Connection Pooling
-
-`HTTPAdapter` uses `requests.Session` which provides connection pooling by default.
-
-### Lazy Parsing
-
-`ApiForgeResponse` parses JSON/text only when accessed:
-
-```python
-response = client.request("users")
-# Response content is raw bytes
-
-data = response.json()
-# Now parsed
-```
-
-### Timeout Configuration
-
-```python
-client = ApiForgeClient(
-    config_path="config.json",
-    timeout=30.0,  # 30 second timeout
-)
-```
-
-## Testing Strategy
-
-### Unit Tests
-
-- Test each component in isolation
-- Mock HTTP responses
-- Verify error handling
-
-### Integration Tests
-
-- Test complete request lifecycle
-- Test configuration loading
-- Test error propagation
+## Testing
 
 ### Test Coverage
 
-Current coverage: 117 tests across 6 files
+- 250 tests across 11 test files
+- Unit tests for all core components
+- Integration tests for end-to-end flows
+- Config validation tests for Yandex APIs
 
 ```
 tests/
-├── test_adapter.py      # HTTPAdapter, Executor
-├── test_client.py       # Client, Resource, Response
-├── test_config.py       # Config loading
-├── test_cli.py          # CLI commands
-├── test_serializers.py  # JSON serializer
-└── test_integration.py  # End-to-end tests
+├── test_adapter.py       # Adapter, Executor tests
+├── test_client.py        # Client, Resource, Response tests
+├── test_config.py        # Config loading, validation tests
+├── test_cli.py           # CLI tests
+├── test_serializers.py   # Serializer tests
+├── test_integration.py   # End-to-end tests
+└── test_yandex_*.py      # Yandex config tests (5 files)
 ```
 
-## Future Architecture
+## Future Enhancements
 
-### Planned Enhancements
-
-1. **Async Support**: `AsyncHTTPAdapter` using httpx
+1. **Async Support**: `AsyncAdapter` using httpx
 2. **Caching**: Response caching layer
 3. **Rate Limiting**: Client-side rate limiting
 4. **Logging**: Request/response logging
 5. **Metrics**: Performance metrics collection
-
-### Architecture Evolution
-
-The current architecture supports these enhancements through:
-
-- **Adapter pattern**: Async adapter can be added without changing core
-- **Strategy pattern**: Caching can be added as a decorator
-- **Middleware pattern**: Logging/metrics can be added as middleware

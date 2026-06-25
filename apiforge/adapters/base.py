@@ -5,11 +5,14 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, Optional
 
-from ..core.response import ApiForgeResponse
+from ..response import Response
 
 
 class BaseAdapter(ABC):
     """Abstract base class for HTTP adapters."""
+
+    def __init__(self, on_before_request: Optional[Any] = None) -> None:
+        self._on_before_request = on_before_request
 
     @abstractmethod
     def request(
@@ -20,7 +23,7 @@ class BaseAdapter(ABC):
         data: Optional[Any] = None,
         headers: Optional[dict[str, str]] = None,
         **kwargs: Any,
-    ) -> ApiForgeResponse:
+    ) -> Response:
         """Send an HTTP request."""
         pass
 
@@ -30,7 +33,7 @@ class BaseAdapter(ABC):
         params: Optional[dict[str, Any]] = None,
         headers: Optional[dict[str, str]] = None,
         **kwargs: Any,
-    ) -> ApiForgeResponse:
+    ) -> Response:
         """Send a GET request."""
         return self.request("GET", url, params=params, headers=headers, **kwargs)
 
@@ -41,7 +44,7 @@ class BaseAdapter(ABC):
         params: Optional[dict[str, Any]] = None,
         headers: Optional[dict[str, str]] = None,
         **kwargs: Any,
-    ) -> ApiForgeResponse:
+    ) -> Response:
         """Send a POST request."""
         return self.request(
             "POST", url, data=data, params=params, headers=headers, **kwargs
@@ -54,7 +57,7 @@ class BaseAdapter(ABC):
         params: Optional[dict[str, Any]] = None,
         headers: Optional[dict[str, str]] = None,
         **kwargs: Any,
-    ) -> ApiForgeResponse:
+    ) -> Response:
         """Send a PUT request."""
         return self.request(
             "PUT", url, data=data, params=params, headers=headers, **kwargs
@@ -66,7 +69,7 @@ class BaseAdapter(ABC):
         params: Optional[dict[str, Any]] = None,
         headers: Optional[dict[str, str]] = None,
         **kwargs: Any,
-    ) -> ApiForgeResponse:
+    ) -> Response:
         """Send a DELETE request."""
         return self.request("DELETE", url, params=params, headers=headers, **kwargs)
 
@@ -77,7 +80,7 @@ class BaseAdapter(ABC):
         params: Optional[dict[str, Any]] = None,
         headers: Optional[dict[str, str]] = None,
         **kwargs: Any,
-    ) -> ApiForgeResponse:
+    ) -> Response:
         """Send a PATCH request."""
         return self.request(
             "PATCH", url, data=data, params=params, headers=headers, **kwargs

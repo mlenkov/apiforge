@@ -11,8 +11,7 @@ Thank you for your interest in contributing to ApiForge! This document provides 
 - [Testing](#testing)
 - [Code Style](#code-style)
 - [Pull Request Process](#pull-request-process)
-- [Reporting Bugs](#reporting-bugs)
-- [Suggesting Features](#suggesting-features)
+- [Architecture](#architecture)
 - [License](#license)
 
 ## Code of Conduct
@@ -37,7 +36,7 @@ Please be respectful and inclusive in all interactions. We follow the [Contribut
 ### Prerequisites
 
 - Python 3.10 or higher
-- pip or poetry
+- pip
 
 ### Installation
 
@@ -74,10 +73,10 @@ mypy .
 
 ### Commit Messages
 
-Use clear, descriptive commit messages:
+Use clear, descriptive commit messages following [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```
-Add pagination support for list endpoints
+feat: add pagination support for list endpoints
 
 - Implement PaginationHelper class
 - Add cursor-based pagination
@@ -86,26 +85,40 @@ Add pagination support for list endpoints
 Closes #123
 ```
 
+Types:
+- `feat:` — New feature
+- `fix:` — Bug fix
+- `docs:` — Documentation
+- `style:` — Formatting (no code change)
+- `refactor:` — Code restructuring
+- `test:` — Adding tests
+- `chore:` — Maintenance
+
 ### Code Organization
 
 ```
 apiforge/
-├── __init__.py           # Public API
-├── core/                 # Core functionality
-│   ├── client.py         # Main client
-│   ├── executor.py       # Request execution
-│   ├── resource.py       # Resource handling
-│   └── response.py       # Response wrapper
-├── adapters/             # HTTP adapters
-│   ├── base.py           # Abstract adapter
-│   └── http.py           # HTTP implementation
-├── serializers/          # Data serializers
-│   ├── base.py           # Abstract serializer
-│   └── json.py           # JSON implementation
-├── config.py             # Configuration handling
-├── cli.py                # CLI tools
-└── exceptions.py         # Exception hierarchy
+├── __init__.py              # Public API with backward-compat aliases
+├── client.py                # Client (main entry point)
+├── executor.py              # Executor (coordinates adapter calls)
+├── resource.py              # Resource (endpoint definition)
+├── response.py              # Response (HTTP response wrapper)
+├── exceptions.py            # Exception hierarchy
+├── cli.py                   # CLI tools
+├── config/                  # Configuration package
+│   ├── __init__.py          # Re-exports
+│   ├── loader.py            # load_config()
+│   ├── validator.py         # JSON Schema validation
+│   └── discovery.py         # get_config_path(), list_configs()
+├── adapters/                # Transport layer
+│   ├── __init__.py
+│   ├── base.py              # BaseAdapter (ABC) with on_before_request
+│   └── requests_adapter.py  # RequestsAdapter (requests library)
+├── core/                    # Backward-compat shims (do not modify)
+└── serializers/             # Unused (dead code)
 ```
+
+**Important**: The `core/` directory contains backward-compatibility shims. Do not add new code there — use the root-level modules instead.
 
 ## Testing
 
@@ -136,7 +149,7 @@ Example:
 import pytest
 from unittest.mock import MagicMock, patch
 
-from apiforge import ApiForgeClient
+from apiforge import Client
 from apiforge.exceptions import ApiForgeConfigError
 
 
@@ -150,14 +163,14 @@ def sample_config():
     }
 
 
-class TestApiForgeClient:
+class TestClient:
     def test_client_creation(self, sample_config):
-        client = ApiForgeClient(config=sample_config)
+        client = Client(config=sample_config)
         assert client is not None
     
     def test_client_no_config(self):
         with pytest.raises(ApiForgeConfigError):
-            ApiForgeClient()
+            Client()
 ```
 
 ### Test Coverage
@@ -165,6 +178,7 @@ class TestApiForgeClient:
 - Aim for >80% code coverage
 - Test edge cases and error conditions
 - Test both success and failure paths
+- Current: 250 tests passing
 
 ## Code Style
 
@@ -205,27 +219,7 @@ mypy .
 - Line length: 88 characters (Black default)
 - Use type hints for all public functions
 - Follow PEP 8 for naming conventions
-- Use docstrings for all public classes and functions
-
-Example:
-
-```python
-def get_resource(self, name: str) -> Resource:
-    """Get a resource by name.
-
-    Args:
-        name: Name of the resource
-
-    Returns:
-        Resource object
-
-    Raises:
-        ApiForgeConfigError: If resource not found
-    """
-    if name not in self._resources:
-        raise ApiForgeConfigError(f"Resource '{name}' not found")
-    return self._resources[name]
-```
+- No inline comments unless explaining "why" not "what"
 
 ## Pull Request Process
 
@@ -244,7 +238,6 @@ def get_resource(self, name: str) -> Resource:
    ```
 
 3. Update documentation if needed
-
 4. Add tests for new functionality
 
 ### PR Description
@@ -272,14 +265,13 @@ for large datasets. This adds cursor-based pagination support.
 ## Implementation
 
 - Added `PaginationHelper` class in `apiforge/helpers/pagination.py`
-- Updated `ApiForgeClient` to support pagination parameters
+- Updated `Client` to support pagination parameters
 - Added documentation in `docs/pagination.md`
 
 ## Testing
 
 - Added unit tests in `tests/test_pagination.py`
 - Added integration tests in `tests/test_integration.py`
-- Manual testing with Yandex Metrika API
 
 ## Breaking Changes
 
@@ -292,52 +284,28 @@ None. This is a backward-compatible addition.
 2. Address any feedback
 3. Once approved, PR will be merged
 
-## Reporting Bugs
+## Architecture
 
-### Bug Report Template
+### Key Principles
 
-```markdown
-**Describe the bug**
-A clear description of what the bug is.
+1. **Separation of concerns**: Transport (ApiForge) separate from policy (MCP)
+2. **Backward compatibility**: Old import paths must keep working
+3. **Minimal surface area**: No unnecessary abstractions
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Create config with '...'
-2. Run code '...'
-3. See error
+### MCP Integration
 
-**Expected behavior**
-What you expected to happen.
+When adding MCP-related features:
+- Access control belongs in the MCP layer, not ApiForge core
+- Use `on_before_request` hook for policy enforcement
+- Keep the core library policy-agnostic
 
-**Screenshots**
-If applicable, add screenshots.
+### Adding New Features
 
-**Environment**
-- OS: [e.g., macOS, Windows]
-- Python version: [e.g., 3.10]
-- ApiForge version: [e.g., 0.1.0]
-
-**Additional context**
-Any other context about the problem.
-```
-
-## Suggesting Features
-
-### Feature Request Template
-
-```markdown
-**Is your feature request related to a problem?**
-A clear description of the problem. Ex. "I'm always frustrated when..."
-
-**Describe the solution you'd like**
-A clear description of what you want to happen.
-
-**Describe alternatives you've considered**
-Alternative solutions or features you've considered.
-
-**Additional context**
-Any other context or screenshots about the feature request.
-```
+1. Check if feature belongs in core or MCP layer
+2. If core: add to appropriate module
+3. If MCP: implement in MCP server, use hooks
+4. Add tests
+5. Update documentation
 
 ## License
 

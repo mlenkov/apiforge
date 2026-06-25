@@ -180,19 +180,3 @@ class TestListConfigs:
                 m.setenv("HOME", tmpdir)
                 configs = list_configs()
                 assert configs == {}
-
-
-class TestGetConfigPath:
-    def test_get_config_path(self):
-        path = get_config_path("yandex", "metrika")
-        assert path.name == "metrika.json"
-        assert "yandex" in str(path)
-
-
-class TestListConfigs:
-    def test_list_configs_empty(self, tmp_path):
-        with tempfile.TemporaryDirectory() as tmpdir:
-            with pytest.MonkeyPatch.context() as m:
-                m.setenv("HOME", tmpdir)
-                configs = list_configs()
-                assert configs == {}

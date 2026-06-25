@@ -372,10 +372,10 @@ Add headers to specific resources:
 ApiForge validates configurations automatically:
 
 ```python
-from apiforge import ApiForgeClient
+from apiforge import Client
 
 try:
-    client = ApiForgeClient(config_path="config.json")
+    client = Client(config_path="config.json")
 except ApiForgeConfigError as e:
     print(f"Invalid configuration: {e}")
 ```
@@ -459,7 +459,7 @@ def load_config_with_env(path):
 
 # Usage
 config = load_config_with_env("config.json")
-client = ApiForgeClient(config=config)
+client = Client(config=config)
 ```
 
 ### Setting Environment Variables
@@ -492,12 +492,12 @@ configs/
 
 ```python
 import os
-from apiforge import ApiForgeClient
+from apiforge import Client
 
 env = os.environ.get("ENV", "development")
 config_path = f"configs/{env}.json"
 
-client = ApiForgeClient(config_path=config_path)
+client = Client(config_path=config_path)
 ```
 
 ### Config Directory Structure
@@ -524,7 +524,7 @@ path = get_config_path("yandex", "metrika")
 
 # Load config
 config = load_config(path)
-client = ApiForgeClient(config=config)
+client = Client(config=config)
 ```
 
 ## Complete Example

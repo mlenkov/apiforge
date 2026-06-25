@@ -1,6 +1,6 @@
 """Adapters module for ApiForge."""
 
 from .base import BaseAdapter
-from .http import HTTPAdapter
+from .requests_adapter import RequestsAdapter
 
-__all__ = ["BaseAdapter", "HTTPAdapter"]
+__all__ = ["BaseAdapter", "RequestsAdapter"]

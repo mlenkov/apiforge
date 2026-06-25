@@ -28,8 +28,8 @@ def doctor(provider: Optional[str] = None, api_name: Optional[str] = None) -> No
         print("  apiforge install")
         return
 
-    errors = []
-    warnings = []
+    errors: list[str] = []
+    warnings: list[str] = []
 
     providers_to_check = [provider] if provider else list(configs.keys())
 
@@ -87,8 +87,6 @@ def doctor(provider: Optional[str] = None, api_name: Optional[str] = None) -> No
 
 def install() -> None:
     """Install default configs."""
-    from .config import get_config_path
-
     config_dir = Path.home() / ".apiforge" / "configs"
     config_dir.mkdir(parents=True, exist_ok=True)
 

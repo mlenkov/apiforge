@@ -11,7 +11,7 @@ from apiforge.config import load_config
 @pytest.fixture
 def audience_config_path():
     """Path to Yandex Audience config file."""
-    return Path(__file__).parent.parent / "apiforge-configs" / "yandex" / "audience.json"
+    return Path(__file__).parent.parent / "examples/configs" / "yandex" / "audience.json"
 
 
 @pytest.fixture

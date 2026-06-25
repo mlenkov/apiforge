@@ -28,42 +28,55 @@ When reporting a vulnerability, please include:
 - **Initial Assessment**: Within 1 week
 - **Fix**: Depends on severity, typically within 2 weeks
 
-## Security Best Practices
+## Security Considerations
 
-When using ApiForge:
+### MCP Server Integration
 
-1. **Never commit credentials** to version control
-2. **Use environment variables** for API tokens
-3. **Validate configurations** before use
-4. **Keep dependencies updated**
-5. **Use HTTPS** for all API endpoints
+When using ApiForge as an MCP transport:
 
-### Secure Configuration Example
+1. **Access Control**: Implement policy checks in MCP layer using `on_before_request` hook
+2. **Token Management**: Handle token refresh in MCP layer, not in ApiForge core
+3. **Rate Limiting**: Enforce rate limits at MCP layer per user/role
+4. **Audit Logging**: Log all requests via `on_before_request` hook
+
+Example policy implementation:
 
 ```python
-import os
-from apiforge import ApiForgeClient
+from apiforge import Client
 
-# Use environment variables for sensitive data
-client = ApiForgeClient(
+def enforce_security_policy(method: str, url: str):
+    """MCP security policy."""
+    # Check permissions
+    if method != "GET" and not user_has_write_access():
+        raise PermissionError("Insufficient permissions")
+    
+    # Rate limiting
+    if is_rate_limited(user_id):
+        raise RateLimitError("Too many requests")
+    
+    # Audit logging
+    logger.info(f"Request: {method} {url}")
+
+client = Client(
     config_path="config.json",
-    auth={"token": os.environ.get("API_TOKEN")}
+    on_before_request=enforce_security_policy
 )
 ```
 
-### Configuration File Best Practices
+### Secure Configuration
+
+#### Never Commit Credentials
 
 ```json
 {
   "base_url": "https://api.example.com",
   "auth": {
     "token": "${API_TOKEN}"
-  },
-  "resources": { ... }
+  }
 }
 ```
 
-Use `${ENV_VAR}` syntax and resolve at runtime:
+Use environment variables and resolve at runtime:
 
 ```python
 import os
@@ -81,6 +94,50 @@ def load_config_with_env(path):
             config["auth"]["token"] = os.environ.get(env_var, "")
     
     return config
+```
+
+#### Use HTTPS Only
+
+Always use HTTPS endpoints:
+
+```json
+{
+  "base_url": "https://api.example.com"
+}
+```
+
+#### Certificate Verification
+
+The `requests` library verifies SSL certificates by default. Never disable verification:
+
+```python
+# Good - verification enabled (default)
+response = requests.get(url)
+
+# Bad - verification disabled
+response = requests.get(url, verify=False)  # Don't do this!
+```
+
+### Logging Sensitive Data
+
+**Never log sensitive data** such as:
+
+- API tokens
+- Passwords
+- Personal information
+
+### Safe Logging Example
+
+```python
+import logging
+
+logger = logging.getLogger(__name__)
+
+# Safe - logs only non-sensitive info
+logger.info("Making request to %s", url)
+
+# Unsafe - logs sensitive data
+logger.debug("Request headers: %s", headers)  # May contain auth token
 ```
 
 ## Dependency Security
@@ -105,51 +162,16 @@ pip install --upgrade -r requirements.txt
 pip-compile --upgrade requirements.in
 ```
 
-## Logging Sensitive Data
+## Best Practices
 
-**Never log sensitive data** such as:
-
-- API tokens
-- Passwords
-- Personal information
-
-### Safe Logging Example
-
-```python
-import logging
-
-logger = logging.getLogger(__name__)
-
-# Safe - logs only non-sensitive info
-logger.info("Making request to %s", url)
-
-# Unsafe - logs sensitive data
-logger.debug("Request headers: %s", headers)  # May contain auth token
-```
-
-## Network Security
-
-### HTTPS Only
-
-Always use HTTPS endpoints:
-
-```json
-{
-  "base_url": "https://api.example.com"
-}
-```
-
-### Certificate Verification
-
-The `requests` library verifies SSL certificates by default. Never disable verification:
-
-```python
-# Good - verification enabled (default)
-response = requests.get(url)
-
-# Bad - verification disabled
-response = requests.get(url, verify=False)  # Don't do this!
-```
+1. **Never commit credentials** to version control
+2. **Use environment variables** for API tokens
+3. **Validate configurations** before use
+4. **Keep dependencies updated**
+5. **Use HTTPS** for all API endpoints
+6. **Implement access control** at MCP layer
+7. **Log all requests** for audit trail
+8. **Enforce rate limits** per user/role
 
 ## Reporting Security Issues
 
